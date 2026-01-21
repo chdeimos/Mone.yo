@@ -1,0 +1,26 @@
+{
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "loading": "Loading...",
+        "noData": "No data available"
+    },
+    "dashboard": {
+        "totalBalance": "Total Balance",
+        "budgetControl": "Budget Control",
+        "myAccounts": "My Accounts",
+        "healthStatus": "Financial Health",
+        "movements": "Movements",
+        "newAccount": "New Account",
+        "newTransaction": "Transaction",
+        "scanTicket": "SCAN TICKET"
+    },
+    "accounts": {
+        "bank": "Bank",
+        "cash": "Cash",
+        "card": "Card",
+        "savings": "Savings"
+    }
+}

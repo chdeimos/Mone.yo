@@ -1,0 +1,182 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum TransactionType {
+  GASTO
+  INGRESO
+  TRASPASO
+}
+
+enum RecurrencePeriod {
+  DIARIO
+  SEMANAL
+  MENSUAL
+  ANUAL
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  name              String
+  password          String
+  role              Role     @default(USER)
+  permissions       Json?    @default("{}")
+  twoFactorEnabled  Boolean  @default(false)
+  twoFactorSecret   String?
+  monthlyReportEnabled Boolean @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model AccountType {
+  id        String    @id @default(uuid())
+  name      String    @unique // Ej: Banco, Efectivo, Crypto, Broker
+  icon      String?
+  accounts  Account[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Account {
+  id              String       @id @default(uuid())
+  name            String
+  initialBalance  Decimal      @default(0)
+  balance         Decimal      @default(0)
+  showOnDashboard Boolean      @default(true)
+  typeId          String
+  type            AccountType  @relation(fields: [typeId], references: [id])
+  currency        String       @default("EUR")
+  color           String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  sentTransfers   Transaction[] @relation("OriginAccount")
+  receivedTransfers Transaction[] @relation("DestinationAccount")
+  transactions    Transaction[] @relation("AccountTransactions")
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  color        String?
+  icon         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Transaction {
+  id              String           @id @default(uuid())
+  amount          Decimal
+  description     String?
+  date            DateTime         @default(now())
+  type            TransactionType
+  isVerified      Boolean          @default(false)
+  
+  // Recurrencia
+  isRecurring     Boolean          @default(false)
+  isPaused        Boolean          @default(false)
+  recurrencePeriod RecurrencePeriod?
+  recurrenceInterval Int?          @default(1)
+  
+  // Relaciones
+  accountId       String
+  account         Account          @relation("AccountTransactions", fields: [accountId], references: [id])
+  
+  categoryId      String?
+  category        Category?        @relation(fields: [categoryId], references: [id])
+
+  originAccountId      String?
+  originAccount        Account?    @relation("OriginAccount", fields: [originAccountId], references: [id])
+  destinationAccountId String?
+  destinationAccount   Account?    @relation("DestinationAccount", fields: [destinationAccountId], references: [id])
+
+  tags            Tag[]
+  
+  frequencyId     String?
+  frequency       Frequency?       @relation(fields: [frequencyId], references: [id])
+  attachmentPath  String?
+  images          TransactionImage[]
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Frequency {
+  id           String        @id @default(uuid())
+  name         String
+  days         Int
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Tag {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  transactions Transaction[]
+}
+
+model Budget {
+  id         String   @id @default(uuid())
+  limit      Decimal
+  current    Decimal  @default(0) // Acumulado actual para rapidez de consulta
+  month      Int
+  year       Int
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([categoryId, month, year])
+}
+
+model Configuration {
+  id             String @id @default("global")
+  iaPrompt       String @db.Text
+  bankPdfPrompt  String? @db.Text
+  iaModel        String @default("gemini-2.5-flash-image")
+  reportEmail    String?
+  reportDay      Int?    @default(1)
+  reportPrompt   String? @db.Text
+}
+
+model TransactionImage {
+  id            String      @id @default(uuid())
+  url           String
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   // ERROR, WARN, INFO
+  message   String
+  stack     String?  @db.Text
+  context   String?
+  createdAt DateTime @default(now())
+}
+
+model AccessLog {
+  id        String   @id @default(uuid())
+  email     String?
+  action    String   // LOGIN, LOGOUT, FAILED_LOGIN, 2FA_VERIFY
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}

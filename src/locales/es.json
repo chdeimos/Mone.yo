@@ -1,0 +1,26 @@
+{
+    "common": {
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "loading": "Cargando...",
+        "noData": "No hay datos disponibles"
+    },
+    "dashboard": {
+        "totalBalance": "Balance Total",
+        "budgetControl": "Control de Presupuesto",
+        "myAccounts": "Mis Cuentas",
+        "healthStatus": "Salud Financiera",
+        "movements": "Movimientos",
+        "newAccount": "Nueva Cuenta",
+        "newTransaction": "Transacción",
+        "scanTicket": "ESCANEAR TICKET"
+    },
+    "accounts": {
+        "bank": "Banco",
+        "cash": "Efectivo",
+        "card": "Tarjeta",
+        "savings": "Ahorros"
+    }
+}
