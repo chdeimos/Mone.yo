@@ -41,6 +41,8 @@ next-env.d.ts
 /prisma/dev.db-journal
 /.env
 /.env.local
+/.ssh/
+/uploads/
 
 # Database/Migration specific
 /prisma/migrations/*
