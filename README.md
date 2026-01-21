@@ -63,6 +63,7 @@ Mone.yo es una plataforma moderna de gestión financiera personal que utiliza In
    ```bash
    npx prisma db push
    npx prisma generate
+   npx prisma db seed
    ```
 
 5. **Iniciar en desarrollo:**
@@ -131,6 +132,7 @@ Instala PM2 para mantener la app funcionando siempre:
 ```bash
 sudo npm install -g pm2
 npx prisma generate
+npx prisma db seed
 npm run build
 pm2 start npm --name "moneyo" -- start
 pm2 save
