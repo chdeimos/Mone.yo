@@ -2,7 +2,7 @@
 
 Mone.yo es una plataforma moderna de gestión financiera personal que utiliza Inteligencia Artificial avanzada para ayudarte a tomar el control total de tu dinero. Diseñada con una estética premium y minimalista, Mone.yo transforma la forma en que interactúas con tus finanzas, desde la lectura automática de tickets hasta reportes estratégicos mensuales.
 
-![Mone.yo Dashboard](https://raw.githubusercontent.com/username/project/main/public/screenshot.png) *(Sustituir por URL real de imagen)*
+![Mone.yo Dashboard](https://github.com/chdeimos/Mone.yo/blob/main/imagenes/app-vision-ia.png)
 
 ## ✨ Características Principales
 
@@ -28,7 +28,7 @@ Mone.yo es una plataforma moderna de gestión financiera personal que utiliza In
 - **Frontend:** Next.js 14, React, Tailwind CSS, Recharts.
 - **Backend:** Next.js API Routes, Server Actions.
 - **Base de Datos:** PostgreSQL con Prisma ORM.
-- **IA:** Google Generative AI (Gemini 1.5 Flash/Pro).
+- **IA:** Google Generative AI (Gemini 2.5 Flash/Pro).
 - **Correo:** Nodemailer (SMTP).
 - **Seguridad:** NextAuth.js, Bcrypt, OTP (2FA).
 
@@ -44,7 +44,7 @@ Mone.yo es una plataforma moderna de gestión financiera personal que utiliza In
 ### Pasos
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/tu-usuario/mone-yo.git
+   git clone https://github.com/chdeimos/mone-yo.git
    cd mone-yo
    ```
 
@@ -106,7 +106,7 @@ Clona el proyecto en `/var/www/moneyo` y configura los permisos:
 sudo mkdir -p /var/www/moneyo
 sudo chown $USER:$USER /var/www/moneyo
 cd /var/www/moneyo
-git clone https://github.com/tu-usuario/mone-yo.git .
+git clone https://github.com/chdeimos/Mone.yo.git.
 npm install
 ```
 
