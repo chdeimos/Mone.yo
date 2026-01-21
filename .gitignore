@@ -35,10 +35,16 @@ yarn-error.log*
 next-env.d.ts
 
 # User uploads/data
-/uploads/*
-!/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
 /prisma/dev.db
 /prisma/dev.db-journal
+/.env
+/.env.local
+
+# Database/Migration specific
+/prisma/migrations/*
+!/prisma/migrations/migration_lock.toml
 
 # Compiled scripts
 scripts/*.js
