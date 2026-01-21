@@ -2,7 +2,7 @@
 
 Mone.yo es una plataforma moderna de gestión financiera personal que utiliza Inteligencia Artificial avanzada para ayudarte a tomar el control total de tu dinero. Diseñada con una estética premium y minimalista, Mone.yo transforma la forma en que interactúas con tus finanzas, desde la lectura automática de tickets hasta reportes estratégicos mensuales.
 
-![Mone.yo Dashboard](https://github.com/chdeimos/Mone.yo/blob/main/imagenes/app-vision-ia.png)
+![Mone.yo Dashboard](imagenes/app-vision-ia.png)
 
 ## ✨ Características Principales
 
@@ -106,7 +106,7 @@ Clona el proyecto en `/var/www/moneyo` y configura los permisos:
 sudo mkdir -p /var/www/moneyo
 sudo chown $USER:$USER /var/www/moneyo
 cd /var/www/moneyo
-git clone https://github.com/chdeimos/Mone.yo.git.
+git clone https://github.com/chdeimos/Mone.yo.git
 npm install
 ```
 
