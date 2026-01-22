@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
     try {
+        console.log("[RESTORE] Iniciando proceso de restauración...");
         const formData = await req.formData();
         const file = formData.get("file") as File;
 
@@ -23,6 +22,7 @@ export async function POST(req: Request) {
 
         // Perform restore in a transaction
         await prisma.$transaction(async (tx) => {
+            console.log("[RESTORE] Limpiando tablas actuales...");
             // 1. Delete everything in reverse dependency order
             await tx.transactionImage.deleteMany();
             await tx.transaction.deleteMany();
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
             await tx.systemLog.deleteMany();
             await tx.accessLog.deleteMany();
 
+            console.log("[RESTORE] Insertando datos del respaldo...");
             // 2. Insert data in correct dependency order
             if (data.users?.length) await tx.user.createMany({ data: data.users });
             if (data.accountTypes?.length) await tx.accountType.createMany({ data: data.accountTypes });
@@ -62,14 +63,13 @@ export async function POST(req: Request) {
             if (data.accessLogs?.length) await tx.accessLog.createMany({ data: data.accessLogs });
         });
 
+        console.log("[RESTORE] Restauración completada con éxito");
         return NextResponse.json({ message: "Base de datos restaurada correctamente" }, { status: 200 });
     } catch (error: any) {
-        console.error("Restore error:", error);
+        console.error("[RESTORE] Error crítico:", error);
         return NextResponse.json({
             message: "Error al restaurar base de datos",
             error: error.message
         }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
     }
 }
