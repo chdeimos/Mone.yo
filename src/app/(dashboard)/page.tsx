@@ -69,16 +69,7 @@ export default function DashboardPage() {
 
         const loadStats = async () => {
             try {
-                // 1. Check & Generate Recurring Transactions first
-                const recurringRes = await fetch("/api/transactions/recurring/check");
-                if (recurringRes.ok) {
-                    const recurringData = await recurringRes.json();
-                    if (recurringData && recurringData.created > 0) {
-                        setNewRecurringCount(recurringData.created);
-                    }
-                }
-
-                // 2. Then load stats
+                // Load stats
                 const res = await fetch("/api/stats");
                 if (res.ok) {
                     const data = await res.json();

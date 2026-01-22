@@ -2,7 +2,12 @@ import cron from "node-cron";
 import { processRecurrentTransactions } from "./recurrence";
 import { checkAndSendMonthlyReports } from "./reports";
 
+let isInitialized = false;
+
 export function initCron() {
+    if (isInitialized) return;
+    isInitialized = true;
+
     console.log("Inicializando motor de tareas programadas (Mone.yo)...");
 
     // Ejecutar cada medianoche
@@ -11,10 +16,4 @@ export function initCron() {
         await processRecurrentTransactions();
         await checkAndSendMonthlyReports();
     });
-
-    // También una ejecución inmediata para pruebas en desarrollo (opcional)
-    if (process.env.NODE_ENV === "development") {
-        console.log("Ejecución de prueba de recurrencia (Dev mode)...");
-        processRecurrentTransactions();
-    }
 }
