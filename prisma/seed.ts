@@ -53,6 +53,77 @@ async function main() {
         });
     }
 
+    // 4. Configuración Global (IA y Reportes)
+    await prisma.configuration.upsert({
+        where: { id: "global" },
+        update: {},
+        create: {
+            id: "global",
+            iaModel: "gemini-2.5-flash-image",
+            iaPrompt: `Eres un asistente experto en análisis de tickets y facturas españolas. Tu tarea es extraer información precisa de las imágenes del ticket.
+
+IMPORTANTE: Si recibes múltiples imágenes, asume que son partes secuenciales del MISMO ticket (cabecera, cuerpo, pie). Analízalas como un único documento continuo. El TOTAL suele estar en la última imagen (pie) y el COMERCIO en la primera (cabecera).
+
+INSTRUCCIONES CRÍTICAS:
+1. Busca el TOTAL FINAL (puede aparecer como "TOTAL", "TOTAL A PAGAR", "IMPORTE", "TOTAL VENTA")
+2. Ignora subtotales, IVA desglosado, o importes parciales
+3. Si hay "CAMBIO" o "ENTREGA", el total es el importe ANTES del cambio
+4. La fecha puede estar en formatos: DD/MM/YYYY, DD-MM-YYYY, o DD.MM.YYYY
+5. El nombre del comercio suele estar en la parte superior en MAYÚSCULAS
+
+FORMATO DE SALIDA (JSON puro, sin markdown):
+{
+  "amount": [número decimal, ejemplo: 49.98],
+  "date": "[YYYY-MM-DD]",
+  "description": "[Nombre del comercio]",
+  "categoryName": "[categoría de la lista]",
+  "accountName": "[cuenta de la lista]"
+}
+
+REGLAS DE EXTRACCIÓN:
+
+IMPORTE: Busca "TOTAL", "IMPORTE", "TOTAL VENTA". Usa punto decimal (49.98 no 49,98). Ignora "CAMBIO" o "ENTREGA".
+
+FECHA: Convierte a formato ISO YYYY-MM-DD. Si no encuentras, usa la fecha de hoy.
+
+DESCRIPCIÓN: Nombre del comercio (parte superior). Máximo 50 caracteres.
+
+CATEGORÍA: Elige de esta lista: {{CATEGORIES}}
+
+CUENTA: Elige de esta lista: {{ACCOUNTS}}
+- Si menciona "TARJETA", "VISA" → cuenta de tarjeta
+- Si menciona "EFECTIVO" → cuenta de efectivo
+- Como último recurso → primera cuenta de la lista
+
+Devuelve ÚNICAMENTE el JSON, sin explicaciones.`,
+            bankPdfPrompt: `Analiza este extracto bancario y extrae movimientos en lista JSON.
+        
+INSTRUCCIONES:
+1. Identifica cada transacción.
+2. Para cada transacción extrae:
+   - date: la fecha en formato YYYY-MM-DD.
+   - description: el concepto o descripción del movimiento.
+   - amount: el importe (siempre como número positivo).
+   - type: "INGRESO" si el dinero entra, "GASTO" si el dinero sale.
+
+REGLAS:
+- Si el documento tiene varias páginas, procésalas todas.
+- Sé preciso con los importes y las fechas.
+- La descripción debe ser concisa pero informativa.
+- Si hay transferencias internas o pagos con tarjeta, identifícalos correctamente.
+- Devuelve exclusivamente un array de objetos JSON, sin markdown ni explicaciones adicionales.`,
+            reportPrompt: `Como experto asesor financiero, analiza mis movimientos del mes pasado.
+        
+IMPORTANTE:
+1. Da una visión general (Ingresos vs Gastos).
+2. Resalta categorías con exceso de gasto.
+3. Da 3 sugerencias concretas de ahorro basadas en los datos.
+4. Usa un tono motivador y profesional.
+5. El formato debe ser HTML rico para el cuerpo del correo.`,
+            reportDay: 1
+        },
+    });
+
     console.log("Mone.yo 2.0 Seed completado satisfactoriamente.");
 }
 

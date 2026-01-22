@@ -71,11 +71,43 @@ A diferencia de otros sistemas, Mone.yo permite personalizar totalmente el compo
 Ve a **Configuración > Inteligencia Artificial (Cerebro IA)**. Aquí podrás modificar:
 
 1. **Identificador del Modelo:** Define qué modelo de Google Gemini utilizar (ej. `gemini-2.5-flash-image`).
-2. **System Prompt (Lógica de Tickets):** Configura las instrucciones que recibe la IA para leer tus tickets. Puedes ajustar el tono, el idioma o reglas específicas de extracción.
+2. **System Prompt (Lógica de Tickets):** Configura las instrucciones que recibe la IA para leer tus tickets.
+
+   **Prompt Predeterminado:**
+   ```text
+   Eres un asistente experto en análisis de tickets y facturas españolas. Tu tarea es extraer información precisa de las imágenes del ticket.
+   IMPORTANTE: Si recibes múltiples imágenes, asume que son partes secuenciales del MISMO ticket.
+   FORMATO DE SALIDA (JSON puro):
+   {
+     "amount": [número],
+     "date": "[YYYY-MM-DD]",
+     "description": "[Nombre comercio]",
+     "categoryName": "{{CATEGORIES}}",
+     "accountName": "{{ACCOUNTS}}"
+   }
+   ```
+
 3. **Lógica de Importación (PDF):** Modifica cómo la IA interpreta los extractos bancarios en PDF.
+
+   **Prompt Predeterminado:**
+   ```text
+   Analiza este extracto bancario y extrae movimientos en lista JSON.
+   Extrae: date (YYYY-MM-DD), description, amount (positivo), type (INGRESO/GASTO).
+   Devuelve exclusivamente un array de objetos JSON.
+   ```
+
 4. **Informe Mensual:** 
    - Define el **Email de Destino** y el **Día del Mes** para el envío.
-   - Personaliza el **Prompt de Análisis**: Dile a la IA si quieres un tono motivador, un análisis técnico o consejos específicos.
+   - Personaliza el **Prompt de Análisis**: 
+
+     **Prompt Predeterminado:**
+     ```text
+     Como experto asesor financiero, analiza mis movimientos del mes pasado.
+     1. Visión general (Ingresos vs Gastos).
+     2. Resalta excesos.
+     3. Da 3 sugerencias de ahorro.
+     Usa formato HTML rico.
+     ```
    - **Probar Informe:** Botón para generar y enviar un reporte de prueba al instante.
 
 ---
