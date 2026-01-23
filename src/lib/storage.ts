@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 export async function saveFile(base64Data: string) {
     const buffer = Buffer.from(base64Data.split(",")[1] || base64Data, "base64");
     const filename = `${uuidv4()}.jpg`;
-    const uploadDir = join(process.cwd(), "uploads");
+    const uploadDir = join(process.cwd(), "public", "uploads");
 
     try {
         await mkdir(uploadDir, { recursive: true });
