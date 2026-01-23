@@ -15,7 +15,7 @@ server {
     client_max_body_size 10M;
 
     location /uploads/ {
-        alias /path/to/moneyo/uploads/; # Cambiar por el path real
+        alias /var/www/moneyo/public/uploads/; # Ruta absoluta a la carpeta public/uploads
         expires 30d;
         add_header Cache-Control "public, no-transform";
     }

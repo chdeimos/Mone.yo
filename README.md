@@ -109,6 +109,8 @@ sudo chown $USER:$USER /var/www/moneyo
 cd /var/www/moneyo
 git clone https://github.com/chdeimos/Mone.yo.git
 npm install
+
+> **Nota para actualizaciones:** Si ya tenías archivos subidos, muévelos de la carpeta raíz `/uploads` a `/public/uploads` para que sigan siendo accesibles.
 ```
 
 Configura el archivo `.env` de producción:
