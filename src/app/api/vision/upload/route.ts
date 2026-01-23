@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(bytes);
 
         // Ensure directory exists
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "receipts");
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
         try {
             await mkdir(uploadDir, { recursive: true });
         } catch (error) {
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
         await writeFile(filepath, buffer);
 
         // Return relative path for DB/Frontend
-        const relativePath = `/uploads/receipts/${filename}`;
+        const relativePath = `/uploads/${filename}`;
 
         return NextResponse.json({ path: relativePath });
 

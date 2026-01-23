@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
 
         const inlineDataParts = [];
         const imageUrls = [];
-        const uploadDir = path.join(process.cwd(), "public/uploads");
-        
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+
         await mkdir(uploadDir, { recursive: true });
 
         let i = 0;
