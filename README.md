@@ -171,7 +171,25 @@ sudo systemctl restart nginx
 
 ---
 
-## 📝 Licencia
+## �️ Mantenimiento y Actualizaciones
+
+Para mantener el servidor al día con los últimos cambios de GitHub, puedes utilizar el script de actualización automática incluido:
+
+1. **Dar permisos de ejecución (solo la primera vez):**
+   ```bash
+   chmod +x actualizacion.sh
+   ```
+
+2. **Ejecutar actualización:**
+   ```bash
+   ./actualizacion.sh
+   ```
+
+El script se encargará de bajar los cambios de Git, instalar nuevas dependencias, sincronizar la base de datos, construir la aplicación y reiniciar el servicio en PM2.
+
+---
+
+## �📝 Licencia
 Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
 
 ---
