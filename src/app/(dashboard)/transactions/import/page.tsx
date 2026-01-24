@@ -157,7 +157,7 @@ export default function ImportTransactionsPage() {
             }
 
             // Identificar el formato basado en las cabeceras
-            let bankFormat: 'caixa' | 'myinvestor' | 'generic' = 'generic';
+            let bankFormat: 'caixa' | 'caixa_new' | 'myinvestor' | 'generic' = 'generic';
             let startRow = 0;
 
             for (let i = 0; i < Math.min(jsonData.length, 20); i++) {
