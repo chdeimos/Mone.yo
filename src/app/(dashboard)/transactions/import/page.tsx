@@ -357,7 +357,7 @@ export default function ImportTransactionsPage() {
                         onClick={() => router.back()}
                         className="group flex items-center gap-2 text-slate-400 hover:text-primary transition-colors text-xs font-black uppercase tracking-widest mb-2"
                     >
-                        <chevronleft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Volver a Movimientos
                     </button>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
