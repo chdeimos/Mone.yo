@@ -8,9 +8,11 @@ export async function GET() {
         const start = startOfMonth(now);
         const end = endOfMonth(now);
 
-        // 1. Patrimonio Total (Suma de saldos de todas las cuentas)
-        const accounts = await prisma.account.findMany();
-        const totalBalance = accounts.reduce((acc: number, curr: any) => acc + Number(curr.balance), 0);
+        // 1. Patrimonio Total (Suma de saldos de las cuentas visibles en Dashboard)
+        const visibleAccounts = await prisma.account.findMany({
+            where: { showOnDashboard: true }
+        });
+        const totalBalance = visibleAccounts.reduce((acc: number, curr: any) => acc + Number(curr.balance), 0);
 
         // 2. Ingresos del Mes
         const incomeTransactions = await prisma.transaction.findMany({
@@ -50,10 +52,7 @@ export async function GET() {
             }
         });
 
-        // 5. Cuentas visibles en Dashboard
-        const visibleAccounts = await prisma.account.findMany({
-            where: { showOnDashboard: true }
-        });
+        // 5. Cuentas visibles en Dashboard ya obtenidas en el punto 1
 
         // 6. Presupuestos del mes - Calculando el gasto real dinámicamente
         const rawBudgets = await prisma.budget.findMany({
