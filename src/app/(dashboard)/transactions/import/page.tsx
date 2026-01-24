@@ -164,8 +164,18 @@ export default function ImportTransactionsPage() {
                 const rowStr = JSON.stringify(jsonData[i]).toLowerCase();
                 const normalizedRow = rowStr.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-                if (normalizedRow.includes('f. operacion') || (normalizedRow.includes('valor') && normalizedRow.includes('detalle'))) {
-                    bankFormat = 'caixa';
+                if (normalizedRow.includes('f. operacion') || (normalizedRow.includes('valor') && (normalizedRow.includes('detalle') || normalizedRow.includes('mas datos')))) {
+                    // Si el excel tiene las columnas reducidas es el formato nuevo
+                    if (normalizedRow.includes('movimiento') && normalizedRow.includes('importe')) {
+                        bankFormat = 'caixa_new';
+                    } else {
+                        bankFormat = 'caixa';
+                    }
+                    startRow = i + 1;
+                    break;
+                }
+                if (normalizedRow.includes('fecha') && normalizedRow.includes('movimiento') && normalizedRow.includes('importe')) {
+                    bankFormat = 'caixa_new';
                     startRow = i + 1;
                     break;
                 }
@@ -186,6 +196,10 @@ export default function ImportTransactionsPage() {
                     } else if (bankFormat === 'caixa') {
                         const dateCandidate = String(row[4] || row[5] || '');
                         return dateCandidate.includes('/') && dateCandidate.length >= 8;
+                    } else if (bankFormat === 'caixa_new') {
+                        const dateCandidate = row[0];
+                        if (typeof dateCandidate === 'number') return dateCandidate > 40000;
+                        return String(dateCandidate).includes('/') && String(dateCandidate).length >= 8;
                     }
                     return false;
                 })
@@ -207,6 +221,25 @@ export default function ImportTransactionsPage() {
                             } else {
                                 const val = String(row[3] || '0').replace(/\./g, '').replace(',', '.');
                                 amountRaw = parseFloat(val);
+                            }
+                        } else if (bankFormat === 'caixa_new') {
+                            const dateVal = row[0];
+                            if (typeof dateVal === 'number') {
+                                // Fecha de Excel a JS
+                                dateObj = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
+                            } else {
+                                const [day, month, year] = String(dateVal).split('/').map(Number);
+                                dateObj = new Date(year, month - 1, day);
+                            }
+                            const movimiento = String(row[2] || '').trim();
+                            const masDatos = String(row[3] || '').trim();
+                            cleanEntity = movimiento;
+                            description = (movimiento + (masDatos ? ' - ' + masDatos : '')).trim();
+
+                            if (typeof row[4] === 'number') {
+                                amountRaw = row[4];
+                            } else {
+                                amountRaw = parseFloat(String(row[4] || '0').replace(/\./g, '').replace(',', '.'));
                             }
                         } else {
                             const dateStr = String(row[4] || row[5]).trim();
