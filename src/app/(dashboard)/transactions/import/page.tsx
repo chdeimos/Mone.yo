@@ -148,12 +148,20 @@ export default function ImportTransactionsPage() {
             let jsonData: any[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
             // Detección y corrección de CSVs mal procesados (común en MyInvestor)
+            // Si detectamos que XLSX no ha separado bien las columnas (común con ;)
             const singleColWithSemicolon = jsonData.slice(0, 10).filter(row => row.length <= 1 && String(row[0] || '').includes(';')).length;
-            if (singleColWithSemicolon > 3) {
-                jsonData = jsonData.map(row => {
-                    if (row.length <= 1) return String(row[0] || '').split(';');
-                    return row;
-                });
+            if (singleColWithSemicolon >= 2) {
+                const newJsonData: any[][] = [];
+                for (const row of jsonData) {
+                    if (row.length <= 1 && String(row[0] || '').includes(';')) {
+                        // Split manual básico para CSVs con punto y coma
+                        const parts = String(row[0] || '').split(';');
+                        newJsonData.push(parts);
+                    } else if (row.length > 1) {
+                        newJsonData.push(row);
+                    }
+                }
+                jsonData = newJsonData;
             }
 
             // Identificar el formato basado en las cabeceras
@@ -164,8 +172,16 @@ export default function ImportTransactionsPage() {
                 const rowStr = JSON.stringify(jsonData[i]).toLowerCase();
                 const normalizedRow = rowStr.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
+                // MyInvestor Detection
+                if ((normalizedRow.includes('fecha') && normalizedRow.includes('concepto')) || normalizedRow.includes('divisa')) {
+                    if (normalizedRow.includes('divisa') || normalizedRow.includes('importe')) {
+                        bankFormat = 'myinvestor';
+                        startRow = i + 1;
+                        break;
+                    }
+                }
+
                 if (normalizedRow.includes('f. operacion') || (normalizedRow.includes('valor') && (normalizedRow.includes('detalle') || normalizedRow.includes('mas datos')))) {
-                    // Si el excel tiene las columnas reducidas es el formato nuevo
                     if (normalizedRow.includes('movimiento') && normalizedRow.includes('importe')) {
                         bankFormat = 'caixa_new';
                     } else {
@@ -174,34 +190,12 @@ export default function ImportTransactionsPage() {
                     startRow = i + 1;
                     break;
                 }
-                if (normalizedRow.includes('fecha') && normalizedRow.includes('movimiento') && normalizedRow.includes('importe')) {
-                    bankFormat = 'caixa_new';
-                    startRow = i + 1;
-                    break;
-                }
-                if ((normalizedRow.includes('fecha') && normalizedRow.includes('concepto')) || normalizedRow.includes('divisa')) {
-                    if (normalizedRow.includes('divisa') || normalizedRow.includes('importe')) {
-                        bankFormat = 'myinvestor';
-                        startRow = i + 1;
-                        break;
-                    }
-                }
             }
 
             const rawTransactions = jsonData.slice(startRow)
                 .filter(row => {
-                    if (bankFormat === 'myinvestor') {
-                        const dateCandidate = String(row[0] || '');
-                        return dateCandidate.includes('/') && dateCandidate.length >= 8;
-                    } else if (bankFormat === 'caixa') {
-                        const dateCandidate = String(row[4] || row[5] || '');
-                        return dateCandidate.includes('/') && dateCandidate.length >= 8;
-                    } else if (bankFormat === 'caixa_new') {
-                        const dateCandidate = row[0];
-                        if (typeof dateCandidate === 'number') return dateCandidate > 40000;
-                        return String(dateCandidate).includes('/') && String(dateCandidate).length >= 8;
-                    }
-                    return false;
+                    const dateCandidate = String(row[0] || '');
+                    return dateCandidate.includes('/') && dateCandidate.length >= 8;
                 })
                 .map((row, idx) => {
                     try {
@@ -211,21 +205,31 @@ export default function ImportTransactionsPage() {
                         let cleanEntity: string = '';
 
                         if (bankFormat === 'myinvestor') {
-                            const [day, month, year] = String(row[0]).split('/').map(Number);
+                            const dateStr = String(row[0] || '').trim();
+                            const [day, month, year] = dateStr.split('/').map(Number);
                             dateObj = new Date(year, month - 1, day);
                             description = String(row[2] || '').trim();
                             cleanEntity = description;
 
-                            if (typeof row[3] === 'number') {
-                                amountRaw = row[3];
-                            } else {
-                                const val = String(row[3] || '0').replace(/\./g, '').replace(',', '.');
-                                amountRaw = parseFloat(val);
-                            }
+                            const parseAmount = (val: any) => {
+                                if (typeof val === 'number') return val;
+                                let s = String(val || '0').trim();
+                                if (s === '') return 0;
+                                if (s.includes(',') && s.includes('.')) {
+                                    return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+                                }
+                                if (s.includes(',')) {
+                                    return parseFloat(s.replace(',', '.'));
+                                }
+                                if (s.match(/^-?\d+\.\d{3}$/)) {
+                                    return parseFloat(s.replace(/\./g, ''));
+                                }
+                                return parseFloat(s);
+                            };
+                            amountRaw = parseAmount(row[3]);
                         } else if (bankFormat === 'caixa_new') {
                             const dateVal = row[0];
                             if (typeof dateVal === 'number') {
-                                // Fecha de Excel a JS
                                 dateObj = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
                             } else {
                                 const [day, month, year] = String(dateVal).split('/').map(Number);
@@ -235,13 +239,8 @@ export default function ImportTransactionsPage() {
                             const masDatos = String(row[3] || '').trim();
                             cleanEntity = movimiento;
                             description = (movimiento + (masDatos ? ' - ' + masDatos : '')).trim();
-
-                            if (typeof row[4] === 'number') {
-                                amountRaw = row[4];
-                            } else {
-                                amountRaw = parseFloat(String(row[4] || '0').replace(/\./g, '').replace(',', '.'));
-                            }
-                        } else {
+                            amountRaw = typeof row[4] === 'number' ? row[4] : parseFloat(String(row[4] || '0').replace(/\./g, '').replace(',', '.'));
+                        } else if (bankFormat === 'caixa') {
                             const dateStr = String(row[4] || row[5]).trim();
                             const [day, month, year] = dateStr.split('/').map(Number);
                             dateObj = new Date(year, month - 1, day);
@@ -249,7 +248,6 @@ export default function ImportTransactionsPage() {
                             const detail = String(row[18] || '').trim();
                             cleanEntity = entityRaw.replace(/^CORE\s*/i, '').trim();
                             description = (cleanEntity + (detail ? ' - ' + detail : '')).trim();
-
                             if (typeof row[7] === 'number') amountRaw = -Math.abs(row[7]);
                             else if (typeof row[6] === 'number') amountRaw = Math.abs(row[6]);
                             else {
@@ -258,6 +256,13 @@ export default function ImportTransactionsPage() {
                                 if (val7 !== 0) amountRaw = -Math.abs(val7);
                                 else if (val6 !== 0) amountRaw = Math.abs(val6);
                             }
+                        } else {
+                            // Generic
+                            const dateStr = String(row[0] || '').trim();
+                            const [day, month, year] = dateStr.split('/').map(Number);
+                            dateObj = new Date(year, month - 1, day);
+                            description = String(row[1] || '').trim();
+                            amountRaw = typeof row[2] === 'number' ? row[2] : parseFloat(String(row[2] || '0').replace(/\./g, '').replace(',', '.'));
                         }
 
                         if (amountRaw === 0 || isNaN(amountRaw)) return null;
@@ -284,15 +289,11 @@ export default function ImportTransactionsPage() {
                 })
                 .filter(tx => tx !== null);
 
-            if (rawTransactions.length === 0) {
-                setImportData([]);
-            } else {
-                const processedData = rawTransactions.map((tx: any) => ({
-                    ...tx,
-                    selected: !tx.isDuplicate
-                }));
-                setImportData(processedData);
-            }
+            setImportData(rawTransactions.map((tx: any) => ({
+                ...tx,
+                selected: !tx.isDuplicate
+            })));
+
         } catch (error) {
             console.error("Error parsing file:", error);
             alert("Error al leer el archivo.");
@@ -356,7 +357,7 @@ export default function ImportTransactionsPage() {
                         onClick={() => router.back()}
                         className="group flex items-center gap-2 text-slate-400 hover:text-primary transition-colors text-xs font-black uppercase tracking-widest mb-2"
                     >
-                        <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        <chevronleft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         Volver a Movimientos
                     </button>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-4">
