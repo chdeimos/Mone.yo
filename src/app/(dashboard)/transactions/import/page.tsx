@@ -194,8 +194,10 @@ export default function ImportTransactionsPage() {
 
             const rawTransactions = jsonData.slice(startRow)
                 .filter(row => {
-                    const dateCandidate = String(row[0] || '');
-                    return dateCandidate.includes('/') && dateCandidate.length >= 8;
+                    const dateCandidate = row[0];
+                    if (typeof dateCandidate === 'number') return dateCandidate > 40000;
+                    const dateStr = String(dateCandidate || '');
+                    return dateStr.includes('/') && dateStr.length >= 8;
                 })
                 .map((row, idx) => {
                     try {
@@ -205,9 +207,15 @@ export default function ImportTransactionsPage() {
                         let cleanEntity: string = '';
 
                         if (bankFormat === 'myinvestor') {
-                            const dateStr = String(row[0] || '').trim();
-                            const [day, month, year] = dateStr.split('/').map(Number);
-                            dateObj = new Date(year, month - 1, day);
+                            const dateVal = row[0];
+                            if (typeof dateVal === 'number') {
+                                // Fecha de Excel a JS
+                                dateObj = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
+                            } else {
+                                const dateStr = String(dateVal || '').trim();
+                                const [day, month, year] = dateStr.split('/').map(Number);
+                                dateObj = new Date(year, month - 1, day);
+                            }
                             description = String(row[2] || '').trim();
                             cleanEntity = description;
 
