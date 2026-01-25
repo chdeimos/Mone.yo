@@ -57,7 +57,7 @@ export default function RecurringPage() {
     const [destinationAccountId, setDestinationAccountId] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [isPaused, setIsPaused] = useState(false);
-    const [frequencyId, setFrequencyId] = useState("");
+    const [frequencyId, setFrequencyId] = useState("none");
     const [recurrencePeriod, setRecurrencePeriod] = useState("MENSUAL");
     const [recurrenceInterval, setRecurrenceInterval] = useState(1);
     const [nextDate, setNextDate] = useState(new Date().toISOString().split('T')[0]);
@@ -151,7 +151,7 @@ export default function RecurringPage() {
         setDestinationAccountId("");
         setCategoryId("");
         setIsPaused(false);
-        setFrequencyId("");
+        setFrequencyId("none");
         setRecurrencePeriod("MENSUAL");
         setRecurrenceInterval(1);
         setNextDate(new Date().toISOString().split('T')[0]);
@@ -166,7 +166,7 @@ export default function RecurringPage() {
         setDestinationAccountId(tx.destinationAccountId || "");
         setCategoryId(tx.categoryId || "");
         setIsPaused(tx.isPaused || false);
-        setFrequencyId(tx.frequencyId || "");
+        setFrequencyId(tx.frequencyId || "none");
         setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
         setRecurrenceInterval(tx.recurrenceInterval || 1);
         setNextDate(new Date(tx.date).toISOString().split('T')[0]);
@@ -420,7 +420,21 @@ export default function RecurringPage() {
                             </div>
                         ) : null}
 
-                        {type !== "TRASPASO" && (
+                        {type === "TRASPASO" ? (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-left-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cuenta Destino</Label>
+                                <Select value={destinationAccountId} onValueChange={setDestinationAccountId}>
+                                    <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary">
+                                        <SelectValue placeholder="Seleccionar destino..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                        {accounts.filter(a => a.id !== accountId).map(acc => (
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ) : (
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Categoría</Label>
                                 <Select value={categoryId} onValueChange={setCategoryId}>

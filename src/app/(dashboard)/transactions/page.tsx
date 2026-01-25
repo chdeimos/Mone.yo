@@ -117,7 +117,7 @@ export default function TransactionsPage() {
     const [isPaused, setIsPaused] = useState(false);
     const [recurrencePeriod, setRecurrencePeriod] = useState("MENSUAL");
     const [recurrenceInterval, setRecurrenceInterval] = useState(1);
-    const [frequencyId, setFrequencyId] = useState("");
+    const [frequencyId, setFrequencyId] = useState("none");
     const [viewingTx, setViewingTx] = useState<any>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -430,7 +430,7 @@ export default function TransactionsPage() {
         setIsPaused(false);
         setRecurrencePeriod("MENSUAL");
         setRecurrenceInterval(1);
-        setFrequencyId("");
+        setFrequencyId("none");
         setSelectedFiles([]);
     }, []);
 
@@ -448,7 +448,7 @@ export default function TransactionsPage() {
         setIsPaused(tx.isPaused || false);
         setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
         setRecurrenceInterval(tx.recurrenceInterval || 1);
-        setFrequencyId(tx.frequencyId || "");
+        setFrequencyId(tx.frequencyId || "none");
         setIsModalOpen(true);
     }, [resetForm]);
 
