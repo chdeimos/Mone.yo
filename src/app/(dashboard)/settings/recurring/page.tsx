@@ -60,6 +60,7 @@ export default function RecurringPage() {
     const [frequencyId, setFrequencyId] = useState("");
     const [recurrencePeriod, setRecurrencePeriod] = useState("MENSUAL");
     const [recurrenceInterval, setRecurrenceInterval] = useState(1);
+    const [nextDate, setNextDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         loadData();
@@ -102,6 +103,7 @@ export default function RecurringPage() {
             destinationAccountId: type === "TRASPASO" ? destinationAccountId : null,
             originAccountId: accountId,
             categoryId: type === "TRASPASO" ? null : categoryId,
+            date: new Date(nextDate).toISOString(),
             isRecurring: true,
             isPaused,
             frequencyId: (frequencyId && frequencyId !== "none") ? frequencyId : null,
@@ -152,6 +154,7 @@ export default function RecurringPage() {
         setFrequencyId("");
         setRecurrencePeriod("MENSUAL");
         setRecurrenceInterval(1);
+        setNextDate(new Date().toISOString().split('T')[0]);
     };
 
     const openEdit = (tx: any) => {
@@ -166,39 +169,12 @@ export default function RecurringPage() {
         setFrequencyId(tx.frequencyId || "");
         setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
         setRecurrenceInterval(tx.recurrenceInterval || 1);
+        setNextDate(new Date(tx.date).toISOString().split('T')[0]);
         setIsModalOpen(true);
     };
 
     const calculateNextDate = (tx: any) => {
-        const lastDate = new Date(tx.date);
-        let nextDate = new Date(lastDate);
-
-        if (tx.frequencyId && tx.frequency) {
-            nextDate.setDate(lastDate.getDate() + tx.frequency.days);
-        } else if (tx.recurrencePeriod) {
-            const interval = tx.recurrenceInterval || 1;
-            switch (tx.recurrencePeriod) {
-                case "DIARIO":
-                    nextDate.setDate(lastDate.getDate() + interval);
-                    break;
-                case "SEMANAL":
-                    nextDate.setDate(lastDate.getDate() + (7 * interval));
-                    break;
-                case "MENSUAL":
-                    nextDate.setMonth(lastDate.getMonth() + interval);
-                    break;
-                case "ANUAL":
-                    nextDate.setFullYear(lastDate.getFullYear() + interval);
-                    break;
-                default:
-                    // Fallback to monthly if somehow it's empty but isRecurring is true
-                    nextDate.setMonth(lastDate.getMonth() + 1);
-            }
-        } else {
-            // Fallback if no frequency or period info
-            nextDate.setMonth(lastDate.getMonth() + 1);
-        }
-        return nextDate;
+        return new Date(tx.date);
     };
 
     const formattedNextDate = (date: Date) => {
@@ -465,12 +441,25 @@ export default function RecurringPage() {
                             </div>
                         )}
 
-                        <div className="flex items-center justify-between h-14 px-5 bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-md">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Próxima Ejecución</Label>
+                            <Input
+                                type="date"
+                                value={nextDate}
+                                onChange={(e) => setNextDate(e.target.value)}
+                                className="h-11 bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20 rounded-md font-bold text-amber-600"
+                            />
+                            <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 italic">
+                                El movimiento se generará automáticamente a partir de este día.
+                            </p>
+                        </div>
+
+                        <div className="flex items-center justify-between h-14 px-5 bg-slate-50 dark:bg-meta-4/20 border border-stroke dark:border-strokedark rounded-md">
                             <div className="flex flex-col">
-                                <Label className="text-[10px] font-black uppercase text-amber-600 tracking-widest cursor-pointer" htmlFor="pause">Estado de la Suscripción</Label>
-                                <span className="text-[9px] text-amber-400 font-bold uppercase">Pausar ejecución automática</span>
+                                <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest cursor-pointer" htmlFor="pause">Estado</Label>
+                                <span className="text-[9px] text-slate-400 font-bold uppercase italic">Pausar generación</span>
                             </div>
-                            <Switch id="pause" checked={isPaused} onCheckedChange={setIsPaused} className="data-[state=checked]:bg-amber-500" />
+                            <Switch id="pause" checked={isPaused} onCheckedChange={setIsPaused} />
                         </div>
                     </div>
 

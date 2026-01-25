@@ -1153,136 +1153,141 @@ export default function TransactionsPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Fecha</Label>
-                                <Input
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
-                                />
-                            </div>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex justify-between">
+                                <span>{isRecurring ? "Primera / Próxima Ejecución" : "Fecha"}</span>
+                                {isRecurring && <span className="text-primary italic normal-case">Programada</span>}
+                            </Label>
+                            <Input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className={cn(
+                                    "h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold",
+                                    isRecurring && "text-primary border-primary/20 bg-primary/5"
+                                )}
+                            />
+                            {isRecurring && <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 italic">El movimiento se autogenerará en esta fecha.</p>}
+                        </div>
 
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Adjuntar Soportes (Fotos/PDFs)</Label>
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Adjuntar Soportes (Fotos/PDFs)</Label>
-                                <div className="space-y-3">
-                                    <Input
-                                        type="file"
-                                        multiple
-                                        accept="image/*,application/pdf"
-                                        onChange={(e) => {
-                                            const files = Array.from(e.target.files || []);
-                                            setSelectedFiles(prev => [...prev, ...files]);
-                                            // Reset value to allow selecting same file again if deleted
-                                            e.target.value = "";
-                                        }}
-                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs"
-                                    />
+                                <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*,application/pdf"
+                                    onChange={(e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        setSelectedFiles(prev => [...prev, ...files]);
+                                        // Reset value to allow selecting same file again if deleted
+                                        e.target.value = "";
+                                    }}
+                                    className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs"
+                                />
 
-                                    {selectedFiles.length > 0 && (
-                                        <div className="space-y-2">
-                                            {selectedFiles.map((file, idx) => (
-                                                <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-meta-4/50 border border-dashed border-stroke dark:border-strokedark rounded-md group">
-                                                    <div className="flex items-center gap-3 overflow-hidden">
-                                                        <Paperclip className="w-3.5 h-3.5 text-primary shrink-0" />
-                                                        <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate">
-                                                            {file.name}
-                                                        </span>
-                                                        <span className="text-[9px] text-slate-400 font-medium">
-                                                            ({(file.size / 1024).toFixed(1)} KB)
-                                                        </span>
-                                                    </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-7 w-7 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== idx))}
-                                                    >
-                                                        <Trash2 className="w-3.5 h-3.5" />
-                                                    </Button>
+                                {selectedFiles.length > 0 && (
+                                    <div className="space-y-2">
+                                        {selectedFiles.map((file, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-meta-4/50 border border-dashed border-stroke dark:border-strokedark rounded-md group">
+                                                <div className="flex items-center gap-3 overflow-hidden">
+                                                    <Paperclip className="w-3.5 h-3.5 text-primary shrink-0" />
+                                                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate">
+                                                        {file.name}
+                                                    </span>
+                                                    <span className="text-[9px] text-slate-400 font-medium">
+                                                        ({(file.size / 1024).toFixed(1)} KB)
+                                                    </span>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Recurrencia</Label>
-                                <div className="flex w-full items-center justify-between h-11 px-4 bg-slate-50 dark:bg-meta-4 border border-stroke dark:border-strokedark rounded-md">
-                                    <span className="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Activar Movimiento Automático</span>
-                                    <Switch
-                                        id="recurring"
-                                        checked={isRecurring}
-                                        onCheckedChange={setIsRecurring}
-                                    />
-                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-7 w-7 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== idx))}
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        {isRecurring && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Estado de Ejecución</Label>
-                                    <div className="flex items-center justify-between h-11 px-4 bg-slate-50 dark:bg-meta-4 border border-stroke dark:border-strokedark rounded-md transition-colors">
-                                        <div className="flex items-center gap-2 text-slate-500">
-                                            <PauseCircle className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">Pausar</span>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Recurrencia</Label>
+                            <div className="flex w-full items-center justify-between h-11 px-4 bg-slate-50 dark:bg-meta-4 border border-stroke dark:border-strokedark rounded-md">
+                                <span className="text-[10px] font-bold uppercase text-slate-500 tracking-widest">Activar Movimiento Automático</span>
+                                <Switch
+                                    id="recurring"
+                                    checked={isRecurring}
+                                    onCheckedChange={setIsRecurring}
+                                />
+                            </div>
+
+                            {isRecurring && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Estado de Ejecución</Label>
+                                        <div className="flex items-center justify-between h-11 px-4 bg-slate-50 dark:bg-meta-4 border border-stroke dark:border-strokedark rounded-md transition-colors">
+                                            <div className="flex items-center gap-2 text-slate-500">
+                                                <PauseCircle className="w-4 h-4" />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Pausar</span>
+                                            </div>
+                                            <Switch
+                                                id="paused"
+                                                checked={isPaused}
+                                                onCheckedChange={setIsPaused}
+                                            />
                                         </div>
-                                        <Switch
-                                            id="paused"
-                                            checked={isPaused}
-                                            onCheckedChange={setIsPaused}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest text-primary">Frecuencia</Label>
+                                        <Select value={frequencyId} onValueChange={setFrequencyId}>
+                                            <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary focus:ring-primary/20">
+                                                <SelectValue placeholder="Opcional (Personalizada)..." />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                                <SelectItem value="none" className="font-bold">Ninguna (Usar estándar)</SelectItem>
+                                                {frequencies.map((freq) => (
+                                                    <SelectItem key={freq.id} value={freq.id} className="font-bold">
+                                                        {freq.name} ({freq.days} días)
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                            )}
+
+                            {isRecurring && (!frequencyId || frequencyId === "none") && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Periodo Estándar</Label>
+                                        <Select value={recurrencePeriod} onValueChange={setRecurrencePeriod}>
+                                            <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                                <SelectItem value="DIARIO" className="font-bold">DIARIO</SelectItem>
+                                                <SelectItem value="SEMANAL" className="font-bold">SEMANAL</SelectItem>
+                                                <SelectItem value="MENSUAL" className="font-bold">MENSUAL</SelectItem>
+                                                <SelectItem value="ANUAL" className="font-bold">ANUAL</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Intervalo</Label>
+                                        <Input
+                                            type="number"
+                                            value={recurrenceInterval}
+                                            onChange={(e) => setRecurrenceInterval(parseInt(e.target.value) || 1)}
+                                            min="1"
+                                            className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-center"
                                         />
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest text-primary">Frecuencia</Label>
-                                    <Select value={frequencyId} onValueChange={setFrequencyId}>
-                                        <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary focus:ring-primary/20">
-                                            <SelectValue placeholder="Opcional (Personalizada)..." />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                            <SelectItem value="none" className="font-bold">Ninguna (Usar estándar)</SelectItem>
-                                            {frequencies.map((freq) => (
-                                                <SelectItem key={freq.id} value={freq.id} className="font-bold">
-                                                    {freq.name} ({freq.days} días)
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-                        )}
-
-                        {isRecurring && (!frequencyId || frequencyId === "none") && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Periodo Estándar</Label>
-                                    <Select value={recurrencePeriod} onValueChange={setRecurrencePeriod}>
-                                        <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                            <SelectItem value="DIARIO" className="font-bold">DIARIO</SelectItem>
-                                            <SelectItem value="SEMANAL" className="font-bold">SEMANAL</SelectItem>
-                                            <SelectItem value="MENSUAL" className="font-bold">MENSUAL</SelectItem>
-                                            <SelectItem value="ANUAL" className="font-bold">ANUAL</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Intervalo</Label>
-                                    <Input
-                                        type="number"
-                                        value={recurrenceInterval}
-                                        onChange={(e) => setRecurrenceInterval(parseInt(e.target.value) || 1)}
-                                        min="1"
-                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-center"
-                                    />
-                                </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     <DialogFooter className="p-4 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
@@ -1586,10 +1591,15 @@ const TransactionRow = memo(({
                 </div>
             </div>
 
-            <div className="md:col-span-2 flex items-center justify-start md:justify-center mt-2 md:mt-0">
+            <div className="md:col-span-2 flex flex-col items-center justify-center mt-2 md:mt-0">
                 <div className="flex items-center gap-1.5 text-[12px] font-bold text-slate-400 uppercase tracking-widest font-mono">
                     <Calendar className="w-3 h-3 md:hidden" /> {formatDate(tx.date)}
                 </div>
+                {tx.isRecurring && new Date(tx.date) > new Date() && (
+                    <span className="text-[9px] font-black text-primary uppercase tracking-tighter bg-primary/10 px-1.5 py-0.5 rounded mt-1 no-print">
+                        Programado
+                    </span>
+                )}
             </div>
 
             <div className="md:col-span-2 flex items-center justify-start md:justify-center mt-1 md:mt-0">
