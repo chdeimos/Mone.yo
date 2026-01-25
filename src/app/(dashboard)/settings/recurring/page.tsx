@@ -58,6 +58,8 @@ export default function RecurringPage() {
     const [categoryId, setCategoryId] = useState("");
     const [isPaused, setIsPaused] = useState(false);
     const [frequencyId, setFrequencyId] = useState("");
+    const [recurrencePeriod, setRecurrencePeriod] = useState("MENSUAL");
+    const [recurrenceInterval, setRecurrenceInterval] = useState(1);
 
     useEffect(() => {
         loadData();
@@ -102,7 +104,9 @@ export default function RecurringPage() {
             categoryId: type === "TRASPASO" ? null : categoryId,
             isRecurring: true,
             isPaused,
-            frequencyId
+            frequencyId: frequencyId || null,
+            recurrencePeriod: !frequencyId ? recurrencePeriod : null,
+            recurrenceInterval: !frequencyId ? (parseInt(recurrenceInterval.toString()) || 1) : null
         };
 
         const method = editingTx ? "PUT" : "POST";
@@ -146,6 +150,8 @@ export default function RecurringPage() {
         setCategoryId("");
         setIsPaused(false);
         setFrequencyId("");
+        setRecurrencePeriod("MENSUAL");
+        setRecurrenceInterval(1);
     };
 
     const openEdit = (tx: any) => {
@@ -158,6 +164,8 @@ export default function RecurringPage() {
         setCategoryId(tx.categoryId || "");
         setIsPaused(tx.isPaused || false);
         setFrequencyId(tx.frequencyId || "");
+        setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
+        setRecurrenceInterval(tx.recurrenceInterval || 1);
         setIsModalOpen(true);
     };
 
@@ -268,7 +276,8 @@ export default function RecurringPage() {
                                             <span style={{ color: tx.account?.color || '#3c50e0' }}>{tx.account?.name}</span>
                                             <span className="text-slate-300 dark:text-slate-600">•</span>
                                             <span className="text-primary flex items-center gap-1">
-                                                <Clock className="w-3 h-3" /> {tx.frequency?.name || "Personalizado"}
+                                                <Clock className="w-3 h-3" /> {tx.frequency?.name ||
+                                                    (tx.recurrencePeriod ? `${tx.recurrencePeriod} ${tx.recurrenceInterval > 1 ? `(x${tx.recurrenceInterval})` : ''}` : "Mensual")}
                                             </span>
                                             <span className="text-slate-300 dark:text-slate-600">•</span>
                                             <span className="text-amber-600 dark:text-amber-500 flex items-center gap-1">
@@ -391,12 +400,13 @@ export default function RecurringPage() {
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Frecuencia</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Frecuencia Personalizada</Label>
                                 <Select value={frequencyId} onValueChange={setFrequencyId}>
                                     <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary">
-                                        <SelectValue placeholder="Elegir..." />
+                                        <SelectValue placeholder="Opcional..." />
                                     </SelectTrigger>
                                     <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                        <SelectItem value="none" className="font-bold">Ninguna (Usar estándar)</SelectItem>
                                         {frequencies.map(f => (
                                             <SelectItem key={f.id} value={f.id} className="font-bold">{f.name}</SelectItem>
                                         ))}
@@ -404,6 +414,35 @@ export default function RecurringPage() {
                                 </Select>
                             </div>
                         </div>
+
+                        {!frequencyId || frequencyId === "none" ? (
+                            <div className="grid grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Periodo Estándar</Label>
+                                    <Select value={recurrencePeriod} onValueChange={setRecurrencePeriod}>
+                                        <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                            <SelectItem value="DIARIO" className="font-bold">DIARIO</SelectItem>
+                                            <SelectItem value="SEMANAL" className="font-bold">SEMANAL</SelectItem>
+                                            <SelectItem value="MENSUAL" className="font-bold">MENSUAL</SelectItem>
+                                            <SelectItem value="ANUAL" className="font-bold">ANUAL</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Intervalo</Label>
+                                    <Input
+                                        type="number"
+                                        value={recurrenceInterval}
+                                        onChange={(e) => setRecurrenceInterval(parseInt(e.target.value) || 1)}
+                                        min="1"
+                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
+                                    />
+                                </div>
+                            </div>
+                        ) : null}
 
                         {type !== "TRASPASO" && (
                             <div className="space-y-2">

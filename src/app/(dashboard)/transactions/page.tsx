@@ -116,6 +116,7 @@ export default function TransactionsPage() {
     const [isRecurring, setIsRecurring] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [recurrencePeriod, setRecurrencePeriod] = useState("MENSUAL");
+    const [recurrenceInterval, setRecurrenceInterval] = useState(1);
     const [frequencyId, setFrequencyId] = useState("");
     const [viewingTx, setViewingTx] = useState<any>(null);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -340,7 +341,8 @@ export default function TransactionsPage() {
             isRecurring,
             isPaused: isRecurring ? isPaused : false,
             recurrencePeriod: isRecurring && !frequencyId ? recurrencePeriod : null,
-            frequencyId: isRecurring ? frequencyId : null,
+            recurrenceInterval: isRecurring && !frequencyId ? (parseInt(recurrenceInterval.toString()) || 1) : null,
+            frequencyId: isRecurring ? (frequencyId || null) : null,
             imageUrls: [] as string[]
         };
 
@@ -427,6 +429,7 @@ export default function TransactionsPage() {
         setIsRecurring(false);
         setIsPaused(false);
         setRecurrencePeriod("MENSUAL");
+        setRecurrenceInterval(1);
         setFrequencyId("");
         setSelectedFiles([]);
     }, []);
@@ -444,6 +447,7 @@ export default function TransactionsPage() {
         setIsRecurring(tx.isRecurring || false);
         setIsPaused(tx.isPaused || false);
         setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
+        setRecurrenceInterval(tx.recurrenceInterval || 1);
         setFrequencyId(tx.frequencyId || "");
         setIsModalOpen(true);
     }, [resetForm]);
@@ -1236,9 +1240,10 @@ export default function TransactionsPage() {
                                     <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest text-primary">Frecuencia</Label>
                                     <Select value={frequencyId} onValueChange={setFrequencyId}>
                                         <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary focus:ring-primary/20">
-                                            <SelectValue placeholder="Elegir periodo..." />
+                                            <SelectValue placeholder="Opcional (Personalizada)..." />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                            <SelectItem value="none" className="font-bold">Ninguna (Usar estándar)</SelectItem>
                                             {frequencies.map((freq) => (
                                                 <SelectItem key={freq.id} value={freq.id} className="font-bold">
                                                     {freq.name} ({freq.days} días)
@@ -1246,6 +1251,35 @@ export default function TransactionsPage() {
                                             ))}
                                         </SelectContent>
                                     </Select>
+                                </div>
+                            </div>
+                        )}
+
+                        {isRecurring && (!frequencyId || frequencyId === "none") && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Periodo Estándar</Label>
+                                    <Select value={recurrencePeriod} onValueChange={setRecurrencePeriod}>
+                                        <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                            <SelectItem value="DIARIO" className="font-bold">DIARIO</SelectItem>
+                                            <SelectItem value="SEMANAL" className="font-bold">SEMANAL</SelectItem>
+                                            <SelectItem value="MENSUAL" className="font-bold">MENSUAL</SelectItem>
+                                            <SelectItem value="ANUAL" className="font-bold">ANUAL</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Intervalo</Label>
+                                    <Input
+                                        type="number"
+                                        value={recurrenceInterval}
+                                        onChange={(e) => setRecurrenceInterval(parseInt(e.target.value) || 1)}
+                                        min="1"
+                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-center"
+                                    />
                                 </div>
                             </div>
                         )}

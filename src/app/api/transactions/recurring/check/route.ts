@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
-export const dynamic = 'force-dynamic'; // Asegura que no se cachee
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        await logger.info("Iniciando proceso de verificación de recurrencias");
+
         // 1. Buscar transacciones activas marcadas como recurrentes
         const activeRecurring = await prisma.transaction.findMany({
             where: {
@@ -18,59 +21,61 @@ export async function GET() {
 
         const createdTransactions = [];
         const now = new Date();
+        now.setHours(23, 59, 59, 999); // Aseguramos tomar el día completo
 
         for (const tx of activeRecurring) {
-            const lastDate = new Date(tx.date);
-            let nextDate = new Date(lastDate);
-            let shouldGenerate = false;
+            let currentTx = tx;
+            let catchUpLimit = 0; // Evitar bucles infinitos por configuración errónea
 
-            // Calcular la siguiente fecha según el periodo
-            if (tx.frequencyId && tx.frequency) {
-                // Frecuencia personalizada (días)
-                nextDate.setDate(lastDate.getDate() + tx.frequency.days);
-            } else if (tx.recurrencePeriod) {
-                // Periodos estándar
-                const interval = tx.recurrenceInterval || 1;
-                switch (tx.recurrencePeriod) {
-                    case "DIARIO":
-                        nextDate.setDate(lastDate.getDate() + interval);
-                        break;
-                    case "SEMANAL":
-                        nextDate.setDate(lastDate.getDate() + (7 * interval));
-                        break;
-                    case "MENSUAL":
-                        nextDate.setMonth(lastDate.getMonth() + interval);
-                        break;
-                    case "ANUAL":
-                        nextDate.setFullYear(lastDate.getFullYear() + interval);
-                        break;
+            while (catchUpLimit < 100) { // Límite de 100 iteraciones por seguridad
+                const lastDate = new Date(currentTx.date);
+                let nextDate = new Date(lastDate);
+
+                // Calcular la siguiente fecha
+                if (currentTx.frequencyId && currentTx.frequency) {
+                    nextDate.setDate(lastDate.getDate() + currentTx.frequency.days);
+                } else if (currentTx.recurrencePeriod) {
+                    const interval = currentTx.recurrenceInterval || 1;
+                    switch (currentTx.recurrencePeriod) {
+                        case "DIARIO":
+                            nextDate.setDate(lastDate.getDate() + interval);
+                            break;
+                        case "SEMANAL":
+                            nextDate.setDate(lastDate.getDate() + (7 * interval));
+                            break;
+                        case "MENSUAL":
+                            nextDate.setMonth(lastDate.getMonth() + interval);
+                            break;
+                        case "ANUAL":
+                            nextDate.setFullYear(lastDate.getFullYear() + interval);
+                            break;
+                    }
+                } else {
+                    // Si no tiene periodo definido, no podemos calcular la siguiente
+                    await logger.warn(`La transacción recurrente ${tx.id} (${tx.description}) no tiene un periodo de frecuencia definido.`);
+                    break;
                 }
-            }
 
-            // Si la fecha calculada es hoy o anterior, generamos el movimiento
-            if (nextDate <= now) {
-                shouldGenerate = true;
-            }
+                // Si la fecha calculada es posterior a ahora, paramos el catch-up
+                if (nextDate > now) {
+                    break;
+                }
 
-            if (shouldGenerate) {
-                // Transacción atómica para asegurar integridad y evitar duplicados en llamadas concurrentes
+                // Generamos el movimiento
                 try {
                     const result = await prisma.$transaction(async (prismaTx) => {
-                        // 1. "Bloqueamos" el movimiento padre asegurándonos de que sigue siendo recurrente
-                        // Usamos updateMany para poder condicionar por isRecurring y evitar que dos procesos
-                        // generen el mismo hijo.
+                        // Bloqueamos el movimiento actual
                         const lock = await prismaTx.transaction.updateMany({
                             where: {
-                                id: tx.id,
+                                id: currentTx.id,
                                 isRecurring: true
                             },
                             data: { isRecurring: false }
                         });
 
-                        // Si el count es 0, significa que otro proceso ya lo marcó como no recurrente
                         if (lock.count === 0) return null;
 
-                        // 2. Crear el nuevo movimiento (que será el nuevo recurrente)
+                        // Crear el nuevo movimiento
                         const newTx = await prismaTx.transaction.create({
                             data: {
                                 amount: tx.amount,
@@ -87,10 +92,13 @@ export async function GET() {
                                 recurrencePeriod: tx.recurrencePeriod,
                                 recurrenceInterval: tx.recurrenceInterval,
                                 frequencyId: tx.frequencyId,
+                            },
+                            include: {
+                                frequency: true
                             }
                         });
 
-                        // 3. Actualizar saldo de la cuenta
+                        // Actualizar saldos
                         if (tx.type === "GASTO") {
                             await prismaTx.account.update({
                                 where: { id: tx.accountId },
@@ -101,6 +109,15 @@ export async function GET() {
                                 where: { id: tx.accountId },
                                 data: { balance: { increment: tx.amount } }
                             });
+                        } else if (tx.type === "TRASPASO" && tx.originAccountId && tx.destinationAccountId) {
+                            await prismaTx.account.update({
+                                where: { id: tx.originAccountId },
+                                data: { balance: { decrement: tx.amount } }
+                            });
+                            await prismaTx.account.update({
+                                where: { id: tx.destinationAccountId },
+                                data: { balance: { increment: tx.amount } }
+                            });
                         }
 
                         return newTx;
@@ -108,16 +125,29 @@ export async function GET() {
 
                     if (result) {
                         createdTransactions.push(result);
+                        currentTx = result; // Para la siguiente vuelta del catch-up
+                        await logger.info(`Generada recurrencia para "${tx.description}" con fecha ${nextDate.toLocaleDateString()}`);
+                    } else {
+                        break;
                     }
                 } catch (txError) {
-                    console.error(`Error processing transaction ${tx.id}:`, txError);
+                    await logger.error(`Error procesando transacción recurrente ${tx.id}:`, txError);
+                    break;
                 }
+                catchUpLimit++;
             }
         }
 
-        return NextResponse.json({ processed: activeRecurring.length, created: createdTransactions.length });
+        if (createdTransactions.length > 0) {
+            await logger.info(`Proceso completado. Se han generado ${createdTransactions.length} nuevos movimientos.`);
+        }
+
+        return NextResponse.json({
+            processed: activeRecurring.length,
+            created: createdTransactions.length
+        });
     } catch (error) {
-        console.error("Error processing recurring transactions:", error);
+        await logger.error("Error crítico en el proceso de recurrencias:", error);
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
