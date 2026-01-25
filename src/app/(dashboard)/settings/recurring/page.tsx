@@ -104,9 +104,9 @@ export default function RecurringPage() {
             categoryId: type === "TRASPASO" ? null : categoryId,
             isRecurring: true,
             isPaused,
-            frequencyId: frequencyId || null,
-            recurrencePeriod: !frequencyId ? recurrencePeriod : null,
-            recurrenceInterval: !frequencyId ? (parseInt(recurrenceInterval.toString()) || 1) : null
+            frequencyId: (frequencyId && frequencyId !== "none") ? frequencyId : null,
+            recurrencePeriod: (!frequencyId || frequencyId === "none") ? recurrencePeriod : null,
+            recurrenceInterval: (!frequencyId || frequencyId === "none") ? (parseInt(recurrenceInterval.toString()) || 1) : null
         };
 
         const method = editingTx ? "PUT" : "POST";

@@ -340,9 +340,9 @@ export default function TransactionsPage() {
             date: new Date(date).toISOString(),
             isRecurring,
             isPaused: isRecurring ? isPaused : false,
-            recurrencePeriod: isRecurring && !frequencyId ? recurrencePeriod : null,
-            recurrenceInterval: isRecurring && !frequencyId ? (parseInt(recurrenceInterval.toString()) || 1) : null,
-            frequencyId: isRecurring ? (frequencyId || null) : null,
+            recurrencePeriod: isRecurring && (!frequencyId || frequencyId === "none") ? recurrencePeriod : null,
+            recurrenceInterval: isRecurring && (!frequencyId || frequencyId === "none") ? (parseInt(recurrenceInterval.toString()) || 1) : null,
+            frequencyId: isRecurring && frequencyId && frequencyId !== "none" ? frequencyId : null,
             imageUrls: [] as string[]
         };
 
