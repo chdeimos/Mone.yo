@@ -61,31 +61,16 @@ export async function GET() {
 
                 try {
                     const result = await prisma.$transaction(async (prismaTx) => {
-                        const lock = await prismaTx.transaction.updateMany({
-                            where: {
-                                id: currentAnchorId,
-                                isRecurring: true
-                            },
-                            data: { isRecurring: false }
-                        });
-
-                        if (lock.count === 0) return null;
-
-                        const newExecutedTx = await prismaTx.transaction.create({
+                        // 1. Convertimos el anchor actual en un movimiento REAL (no recurrente)
+                        const executedTx = await prismaTx.transaction.update({
+                            where: { id: currentAnchorId },
                             data: {
-                                amount: tx.amount,
-                                description: tx.description,
-                                type: tx.type,
-                                accountId: tx.accountId,
-                                categoryId: tx.categoryId,
-                                originAccountId: tx.originAccountId,
-                                destinationAccountId: tx.destinationAccountId,
-                                isVerified: false,
-                                date: executionDate,
                                 isRecurring: false,
+                                date: executionDate // Nos aseguramos que tenga la fecha programada exacta
                             }
                         });
 
+                        // 2. Crear el PRÓXIMO anchor recurrente (para el futuro)
                         const nextAnchor = await prismaTx.transaction.create({
                             data: {
                                 amount: tx.amount,
@@ -106,6 +91,7 @@ export async function GET() {
                             include: { frequency: true }
                         });
 
+                        // 3. ACTUALIZAR SALDOS (ahora sí, porque el movimiento ya es real)
                         if (tx.type === "GASTO") {
                             await prismaTx.account.update({
                                 where: { id: tx.accountId },
@@ -127,14 +113,14 @@ export async function GET() {
                             });
                         }
 
-                        return { executed: newExecutedTx, next: nextAnchor };
+                        return { executed: executedTx, next: nextAnchor };
                     });
 
                     if (result) {
                         createdTransactions.push(result.executed);
                         currentAnchorDate = result.next.date;
                         currentAnchorId = result.next.id;
-                        await logger.info(`Generado movimiento programado para "${tx.description}" (${executionDate.toLocaleDateString()}). Próximo: ${result.next.date.toLocaleDateString()}`);
+                        await logger.info(`Ejecutada recurrencia "${tx.description}" (${executionDate.toLocaleDateString()}). Próxima: ${result.next.date.toLocaleDateString()}`);
                     } else {
                         break;
                     }

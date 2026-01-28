@@ -146,28 +146,31 @@ export async function POST(req: Request) {
                 }
             });
 
-            // 2. Actualizar saldos de cuentas
-            if (type === "INGRESO") {
-                await tx.account.update({
-                    where: { id: accountId },
-                    data: { balance: { increment: amount } }
-                });
-            } else if (type === "GASTO") {
-                await tx.account.update({
-                    where: { id: accountId },
-                    data: { balance: { decrement: amount } }
-                });
-            } else if (type === "TRASPASO" && originAccountId && destinationAccountId) {
-                // Restar de origen
-                await tx.account.update({
-                    where: { id: originAccountId },
-                    data: { balance: { decrement: amount } }
-                });
-                // Sumar a destino
-                await tx.account.update({
-                    where: { id: destinationAccountId },
-                    data: { balance: { increment: amount } }
-                });
+            // 2. Actualizar saldos de cuentas - SOLO si no es una recurrencia (las recurrencias se aplican al ejecutarse)
+            if (!isRecurring) {
+                if (type === "INGRESO") {
+                    await tx.account.update({
+                        where: { id: accountId },
+                        data: { balance: { increment: amount } }
+                    });
+                } else if (type === "GASTO") {
+                    await tx.account.update({
+                        where: { id: accountId },
+                        data: { balance: { decrement: amount } }
+                    });
+                } else if (type === "TRASPASO" && (originAccountId || accountId) && destinationAccountId) {
+                    const orgId = originAccountId || accountId;
+                    // Restar de origen
+                    await tx.account.update({
+                        where: { id: orgId },
+                        data: { balance: { decrement: amount } }
+                    });
+                    // Sumar a destino
+                    await tx.account.update({
+                        where: { id: destinationAccountId },
+                        data: { balance: { increment: amount } }
+                    });
+                }
             }
 
             return newTransaction;

@@ -21,28 +21,30 @@ export async function PUT(
                 throw new Error("Movimiento no encontrado");
             }
 
-            // 2. Revertir impacto del saldo anterior
-            if (oldTx.type === "INGRESO") {
-                await tx.account.update({
-                    where: { id: oldTx.accountId },
-                    data: { balance: { decrement: oldTx.amount } }
-                });
-            } else if (oldTx.type === "GASTO") {
-                await tx.account.update({
-                    where: { id: oldTx.accountId },
-                    data: { balance: { increment: oldTx.amount } }
-                });
-            } else if (oldTx.type === "TRASPASO") {
-                const orgId = oldTx.originAccountId || oldTx.accountId;
-                await tx.account.update({
-                    where: { id: orgId },
-                    data: { balance: { increment: oldTx.amount } }
-                });
-                if (oldTx.destinationAccountId) {
+            // 2. Revertir impacto del saldo anterior - SOLO si no era una recurrencia
+            if (!oldTx.isRecurring) {
+                if (oldTx.type === "INGRESO") {
                     await tx.account.update({
-                        where: { id: oldTx.destinationAccountId },
+                        where: { id: oldTx.accountId },
                         data: { balance: { decrement: oldTx.amount } }
                     });
+                } else if (oldTx.type === "GASTO") {
+                    await tx.account.update({
+                        where: { id: oldTx.accountId },
+                        data: { balance: { increment: oldTx.amount } }
+                    });
+                } else if (oldTx.type === "TRASPASO") {
+                    const orgId = oldTx.originAccountId || oldTx.accountId;
+                    await tx.account.update({
+                        where: { id: orgId },
+                        data: { balance: { increment: oldTx.amount } }
+                    });
+                    if (oldTx.destinationAccountId) {
+                        await tx.account.update({
+                            where: { id: oldTx.destinationAccountId },
+                            data: { balance: { decrement: oldTx.amount } }
+                        });
+                    }
                 }
             }
 
@@ -77,28 +79,30 @@ export async function PUT(
                 }
             });
 
-            // 4. Aplicar el nuevo impacto del saldo
-            if (updated.type === "INGRESO") {
-                await tx.account.update({
-                    where: { id: updated.accountId },
-                    data: { balance: { increment: updated.amount } }
-                });
-            } else if (updated.type === "GASTO") {
-                await tx.account.update({
-                    where: { id: updated.accountId },
-                    data: { balance: { decrement: updated.amount } }
-                });
-            } else if (updated.type === "TRASPASO") {
-                const orgId = updated.originAccountId || updated.accountId;
-                await tx.account.update({
-                    where: { id: orgId },
-                    data: { balance: { decrement: updated.amount } }
-                });
-                if (updated.destinationAccountId) {
+            // 4. Aplicar el nuevo impacto del saldo - SOLO si NO es una recurrencia
+            if (!updated.isRecurring) {
+                if (updated.type === "INGRESO") {
                     await tx.account.update({
-                        where: { id: updated.destinationAccountId },
+                        where: { id: updated.accountId },
                         data: { balance: { increment: updated.amount } }
                     });
+                } else if (updated.type === "GASTO") {
+                    await tx.account.update({
+                        where: { id: updated.accountId },
+                        data: { balance: { decrement: updated.amount } }
+                    });
+                } else if (updated.type === "TRASPASO") {
+                    const orgId = updated.originAccountId || updated.accountId;
+                    await tx.account.update({
+                        where: { id: orgId },
+                        data: { balance: { decrement: updated.amount } }
+                    });
+                    if (updated.destinationAccountId) {
+                        await tx.account.update({
+                            where: { id: updated.destinationAccountId },
+                            data: { balance: { increment: updated.amount } }
+                        });
+                    }
                 }
             }
 
@@ -138,28 +142,30 @@ export async function DELETE(
                 });
             }
 
-            // 2. Revertir el saldo en las cuentas
-            if (transaction.type === "INGRESO") {
-                await tx.account.update({
-                    where: { id: transaction.accountId },
-                    data: { balance: { decrement: transaction.amount } }
-                });
-            } else if (transaction.type === "GASTO") {
-                await tx.account.update({
-                    where: { id: transaction.accountId },
-                    data: { balance: { increment: transaction.amount } }
-                });
-            } else if (transaction.type === "TRASPASO" && transaction.originAccountId && transaction.destinationAccountId) {
-                // Devolver a origen
-                await tx.account.update({
-                    where: { id: transaction.originAccountId },
-                    data: { balance: { increment: transaction.amount } }
-                });
-                // Quitar de destino
-                await tx.account.update({
-                    where: { id: transaction.destinationAccountId },
-                    data: { balance: { decrement: transaction.amount } }
-                });
+            // 2. Revertir el saldo en las cuentas - SOLO si no era una recurrencia (las recurrencias no afectan saldo hasta ejecutarse)
+            if (transaction && !transaction.isRecurring) {
+                if (transaction.type === "INGRESO") {
+                    await tx.account.update({
+                        where: { id: transaction.accountId },
+                        data: { balance: { decrement: transaction.amount } }
+                    });
+                } else if (transaction.type === "GASTO") {
+                    await tx.account.update({
+                        where: { id: transaction.accountId },
+                        data: { balance: { increment: transaction.amount } }
+                    });
+                } else if (transaction.type === "TRASPASO" && transaction.originAccountId && transaction.destinationAccountId) {
+                    // Devolver a origen
+                    await tx.account.update({
+                        where: { id: transaction.originAccountId },
+                        data: { balance: { increment: transaction.amount } }
+                    });
+                    // Quitar de destino
+                    await tx.account.update({
+                        where: { id: transaction.destinationAccountId },
+                        data: { balance: { decrement: transaction.amount } }
+                    });
+                }
             }
 
             // 3. Borrar la transacción
