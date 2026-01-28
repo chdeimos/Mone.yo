@@ -17,8 +17,16 @@ export async function GET(req: Request) {
         const endDate = searchParams.get("endDate");
         const page = searchParams.get("page") ? parseInt(searchParams.get("page")!) : 1;
         const limit = searchParams.get("limit");
-        const limitNum = limit ? parseInt(limit) : undefined;
+        const limitNum = limit && limit !== "all" ? parseInt(limit) : undefined;
         const skip = limitNum ? (page - 1) * limitNum : undefined;
+
+        const sortBy = searchParams.get("sortBy") || "date";
+        const sortOrder = searchParams.get("sortOrder") || "desc";
+
+        // Validate sortBy field to prevent errors
+        const validSortFields = ["date", "amount", "description", "isVerified"];
+        const actualSortBy = validSortFields.includes(sortBy) ? sortBy : "date";
+        const actualSortOrder = sortOrder === "asc" ? "asc" : "desc";
 
         const where = {
             ...(accountId && !destinationAccountId ? {
@@ -69,7 +77,7 @@ export async function GET(req: Request) {
                     images: true,
                 },
                 orderBy: {
-                    date: "desc"
+                    [actualSortBy]: actualSortOrder
                 }
             }),
             prisma.transaction.count({ where }),
@@ -82,11 +90,57 @@ export async function GET(req: Request) {
             })
         ]);
 
-        const summary = {
-            income: typeStats.find(s => s.type === 'INGRESO')?._sum.amount || 0,
-            expenses: typeStats.find(s => s.type === 'GASTO')?._sum.amount || 0,
-            transfers: typeStats.find(s => s.type === 'TRASPASO')?._sum.amount || 0,
-        };
+        // Calcular los sumatorios de forma inteligente
+        let income = 0;
+        let expenses = 0;
+        let transfers = 0;
+
+        if (accountId && !destinationAccountId) {
+            // Lógica contextual para una cuenta específica
+            const [incSum, expSum, transOutSum, transInSum] = await Promise.all([
+                prisma.transaction.aggregate({
+                    where: { ...where, type: 'INGRESO' },
+                    _sum: { amount: true }
+                }),
+                prisma.transaction.aggregate({
+                    where: { ...where, type: 'GASTO' },
+                    _sum: { amount: true }
+                }),
+                // Traspasos donde la cuenta es ORIGEN (Salida)
+                prisma.transaction.aggregate({
+                    where: {
+                        ...where,
+                        type: 'TRASPASO',
+                        OR: [
+                            { originAccountId: accountId },
+                            { AND: [{ originAccountId: null }, { accountId: accountId }] }
+                        ],
+                        NOT: { destinationAccountId: accountId }
+                    },
+                    _sum: { amount: true }
+                }),
+                // Traspasos donde la cuenta es DESTINO (Entrada)
+                prisma.transaction.aggregate({
+                    where: {
+                        ...where,
+                        type: 'TRASPASO',
+                        destinationAccountId: accountId
+                    },
+                    _sum: { amount: true }
+                })
+            ]);
+
+            income = Number(incSum._sum.amount || 0) + Number(transInSum._sum.amount || 0);
+            expenses = Number(expSum._sum.amount || 0) + Number(transOutSum._sum.amount || 0);
+            transfers = 0; // Los traspasos se han redistribuido
+        } else {
+            // Lógica general (sin filtro de cuenta o filtros cruzados)
+            income = Number(typeStats.find(s => s.type === 'INGRESO')?._sum.amount || 0);
+            expenses = Number(typeStats.find(s => s.type === 'GASTO')?._sum.amount || 0);
+            transfers = Number(typeStats.find(s => s.type === 'TRASPASO')?._sum.amount || 0);
+        }
+
+        const summary = { income, expenses, transfers };
 
         return NextResponse.json({
             transactions,

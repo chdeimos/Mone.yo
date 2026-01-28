@@ -22,6 +22,13 @@ export async function GET(req: Request) {
         let startDate: Date;
         let groupBy: 'day' | 'month' = 'day';
 
+        // 1. Get current balance of accounts visible on dashboard
+        const visibleAccounts = await prisma.account.findMany({
+            where: { showOnDashboard: true }
+        });
+        const visibleAccountIds = visibleAccounts.map(a => a.id);
+        const currentTotalBalance = visibleAccounts.reduce((acc, a) => acc + Number(a.balance), 0);
+
         switch (period) {
             case "1m":
                 startDate = subDays(now, 30);
@@ -29,7 +36,7 @@ export async function GET(req: Request) {
                 break;
             case "3m":
                 startDate = subMonths(now, 3);
-                groupBy = 'day'; // Still day for 3 months to see detail
+                groupBy = 'day';
                 break;
             case "6m":
                 startDate = subMonths(now, 6);
@@ -41,6 +48,13 @@ export async function GET(req: Request) {
                 break;
             case "total":
                 const oldestTx = await prisma.transaction.findFirst({
+                    where: {
+                        OR: [
+                            { accountId: { in: visibleAccountIds } },
+                            { originAccountId: { in: visibleAccountIds } },
+                            { destinationAccountId: { in: visibleAccountIds } }
+                        ]
+                    },
                     orderBy: { date: 'asc' }
                 });
                 startDate = oldestTx ? startOfMonth(oldestTx.date) : subMonths(now, 6);
@@ -49,13 +63,6 @@ export async function GET(req: Request) {
             default:
                 startDate = subDays(now, 30);
         }
-
-        // 1. Get current balance of accounts visible on dashboard
-        const visibleAccounts = await prisma.account.findMany({
-            where: { showOnDashboard: true }
-        });
-        const visibleAccountIds = visibleAccounts.map(a => a.id);
-        const currentTotalBalance = visibleAccounts.reduce((acc, a) => acc + Number(a.balance), 0);
 
         // 2. Fetch all transactions desde startDate that involve these accounts
         const transactions = await prisma.transaction.findMany({
@@ -104,24 +111,15 @@ export async function GET(req: Request) {
                 for (const tx of dayTransactions) {
                     const amount = Number(tx.amount);
                     if (tx.type === "INGRESO") {
-                        // Si hoy gané 100, ayer tenía 100 menos
-                        runningBalance -= amount;
+                        if (visibleAccountIds.includes(tx.accountId)) runningBalance -= amount;
                     } else if (tx.type === "GASTO") {
-                        // Si hoy gasté 100, ayer tenía 100 más
-                        runningBalance += amount;
+                        if (visibleAccountIds.includes(tx.accountId)) runningBalance += amount;
                     } else if (tx.type === "TRASPASO") {
                         const isOriginVisible = tx.originAccountId && visibleAccountIds.includes(tx.originAccountId);
                         const isDestVisible = tx.destinationAccountId && visibleAccountIds.includes(tx.destinationAccountId);
 
-                        // Si sale de una cuenta visible a una NO visible -> es como un GASTO para el patrimonio total visible
-                        if (isOriginVisible && !isDestVisible) {
-                            runningBalance += amount;
-                        }
-                        // Si entra de una cuenta NO visible a una visible -> es como un INGRESO
-                        else if (!isOriginVisible && isDestVisible) {
-                            runningBalance -= amount;
-                        }
-                        // Si ambas son visibles o ambas no visibles, el patrimonio total visible no cambia
+                        if (isOriginVisible && !isDestVisible) runningBalance += amount;
+                        else if (!isOriginVisible && isDestVisible) runningBalance -= amount;
                     }
                 }
             }
@@ -183,13 +181,21 @@ export async function GET(req: Request) {
 
                 for (const tx of dayTransactions) {
                     const amount = Number(tx.amount);
-                    if (tx.type === "INGRESO") runningBalance -= amount;
-                    else if (tx.type === "GASTO") runningBalance += amount;
-                    else if (tx.type === "TRASPASO") {
-                        const isOriginVisible = tx.originAccountId && visibleAccountIds.includes(tx.originAccountId);
-                        const isDestVisible = tx.destinationAccountId && visibleAccountIds.includes(tx.destinationAccountId);
-                        if (isOriginVisible && !isDestVisible) runningBalance += amount;
-                        else if (!isOriginVisible && isDestVisible) runningBalance -= amount;
+                    if (tx.type === "INGRESO") {
+                        if (visibleAccountIds.includes(tx.accountId)) runningBalance -= amount;
+                    } else if (tx.type === "GASTO") {
+                        if (visibleAccountIds.includes(tx.accountId)) runningBalance += amount;
+                    } else if (tx.type === "TRASPASO") {
+                        const isOriginVisible = (tx.originAccountId && visibleAccountIds.includes(tx.originAccountId)) || (tx.accountId && visibleAccountIds.includes(tx.accountId) && tx.type === "TRASPASO" && !tx.originAccountId);
+                        // Simplified check for clarity
+                        const originId = tx.originAccountId || tx.accountId;
+                        const destId = tx.destinationAccountId;
+
+                        const isOriginVis = originId && visibleAccountIds.includes(originId);
+                        const isDestVis = destId && visibleAccountIds.includes(destId);
+
+                        if (isOriginVis && !isDestVis) runningBalance += amount;
+                        else if (!isOriginVis && isDestVis) runningBalance -= amount;
                     }
                 }
             }

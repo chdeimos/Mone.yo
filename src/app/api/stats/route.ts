@@ -14,10 +14,13 @@ export async function GET() {
         });
         const totalBalance = visibleAccounts.reduce((acc: number, curr: any) => acc + Number(curr.balance), 0);
 
-        // 2. Ingresos del Mes
+        const visibleAccountIds = visibleAccounts.map(a => a.id);
+
+        // 2. Ingresos del Mes (Solo de cuentas visibles)
         const incomeTransactions = await prisma.transaction.findMany({
             where: {
                 type: "INGRESO",
+                accountId: { in: visibleAccountIds },
                 date: {
                     gte: start,
                     lte: end
@@ -26,10 +29,11 @@ export async function GET() {
         });
         const monthlyIncome = incomeTransactions.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
-        // 3. Gastos del Mes
+        // 3. Gastos del Mes (Solo de cuentas visibles)
         const expenseTransactions = await prisma.transaction.findMany({
             where: {
                 type: "GASTO",
+                accountId: { in: visibleAccountIds },
                 date: {
                     gte: start,
                     lte: end
@@ -38,8 +42,15 @@ export async function GET() {
         });
         const monthlyExpenses = expenseTransactions.reduce((acc: number, curr: any) => acc + Number(curr.amount), 0);
 
-        // 4. Últimos 5 Movimientos
+        // 4. Últimos 5 Movimientos (Solo de cuentas visibles)
         const recentTransactions = await prisma.transaction.findMany({
+            where: {
+                OR: [
+                    { accountId: { in: visibleAccountIds } },
+                    { originAccountId: { in: visibleAccountIds } },
+                    { destinationAccountId: { in: visibleAccountIds } }
+                ]
+            },
             take: 5,
             orderBy: {
                 date: "desc"
@@ -71,6 +82,7 @@ export async function GET() {
                 where: {
                     categoryId: budget.categoryId,
                     type: "GASTO",
+                    accountId: { in: visibleAccountIds },
                     date: {
                         gte: start,
                         lte: end

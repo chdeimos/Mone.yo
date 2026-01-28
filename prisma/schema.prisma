@@ -67,6 +67,10 @@ model Account {
   sentTransfers   Transaction[] @relation("OriginAccount")
   receivedTransfers Transaction[] @relation("DestinationAccount")
   transactions    Transaction[] @relation("AccountTransactions")
+  
+  subscriptions   Subscription[] @relation("SubscriptionAccount")
+  sentSubscriptionTransfers Subscription[] @relation("SubscriptionOrigin")
+  receivedSubscriptionTransfers Subscription[] @relation("SubscriptionDestination")
 }
 
 model Category {
@@ -78,6 +82,7 @@ model Category {
   updatedAt    DateTime      @updatedAt
   transactions Transaction[]
   budgets      Budget[]
+  subscriptions Subscription[]
 }
 
 model Transaction {
@@ -122,6 +127,7 @@ model Frequency {
   name         String
   days         Int
   transactions Transaction[]
+  subscriptions Subscription[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -179,4 +185,36 @@ model AccessLog {
   ip        String?
   userAgent String?
   createdAt DateTime @default(now())
+}
+model Subscription {
+  id              String           @id @default(uuid())
+  amount          Decimal
+  description     String?
+  type            TransactionType
+  isPaused        Boolean          @default(false)
+  
+  recurrencePeriod RecurrencePeriod?
+  recurrenceInterval Int?          @default(1)
+  
+  startDate       DateTime         @default(now())
+  nextExecutionDate DateTime
+  lastExecutionDate DateTime?
+
+  // Relaciones
+  accountId       String
+  account         Account          @relation("SubscriptionAccount", fields: [accountId], references: [id])
+  
+  categoryId      String?
+  category        Category?        @relation(fields: [categoryId], references: [id])
+
+  originAccountId      String?
+  originAccount        Account?    @relation("SubscriptionOrigin", fields: [originAccountId], references: [id])
+  destinationAccountId String?
+  destinationAccount   Account?    @relation("SubscriptionDestination", fields: [destinationAccountId], references: [id])
+
+  frequencyId     String?
+  frequency       Frequency?       @relation(fields: [frequencyId], references: [id])
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }

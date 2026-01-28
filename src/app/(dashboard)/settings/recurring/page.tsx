@@ -15,7 +15,14 @@ import {
     Clock,
     Tags,
     Wallet,
-    History
+    History,
+    CheckCircle,
+    Circle,
+    Check,
+    X,
+    Loader2,
+    Filter,
+    ArrowRight
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,6 +69,106 @@ export default function RecurringPage() {
     const [recurrenceInterval, setRecurrenceInterval] = useState(1);
     const [nextDate, setNextDate] = useState(new Date().toISOString().split('T')[0]);
 
+    // Bulk Actions state
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
+    const [bulkCategoryId, setBulkCategoryId] = useState("no_change");
+    const [bulkAccountId, setBulkAccountId] = useState("no_change");
+    const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+    const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+
+    const toggleSelect = (id: string) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === recurrences.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(recurrences.map(r => r.id));
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (!confirm(`¿Estás seguro de que deseas eliminar ${selectedIds.length} recurrencias?`)) return;
+
+        setIsBulkDeleting(true);
+        try {
+            const res = await fetch("/api/subscriptions/bulk-delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids: selectedIds })
+            });
+
+            if (res.ok) {
+                setSelectedIds([]);
+                loadData();
+            } else {
+                throw new Error("Error deleting subscriptions");
+            }
+        } catch (error) {
+            console.error("Error bulk deleting:", error);
+            alert("Error al eliminar las recurrencias");
+        } finally {
+            setIsBulkDeleting(false);
+        }
+    };
+
+    const handleBulkUpdate = async () => {
+        if (bulkCategoryId === "no_change" && bulkAccountId === "no_change") {
+            alert("No has seleccionado ningún cambio para aplicar");
+            return;
+        }
+
+        setIsBulkUpdating(true);
+        try {
+            const res = await fetch("/api/subscriptions/bulk-update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ids: selectedIds,
+                    categoryId: bulkCategoryId === "no_change" ? undefined : bulkCategoryId,
+                    accountId: bulkAccountId === "no_change" ? undefined : bulkAccountId
+                })
+            });
+
+            if (res.ok) {
+                setSelectedIds([]);
+                setIsBulkEditModalOpen(false);
+                loadData();
+            } else {
+                throw new Error("Error updating subscriptions");
+            }
+        } catch (error) {
+            console.error("Error bulk updating:", error);
+            alert("Error al actualizar las recurrencias");
+        } finally {
+            setIsBulkUpdating(false);
+        }
+    };
+
+    const handleExecute = async (id: string) => {
+        if (!confirm("¿Ejecutar esta recurrencia manualmente ahora? Se creará un nuevo movimiento y la fecha programada avanzará al siguiente ciclo.")) return;
+
+        try {
+            const res = await fetch(`/api/subscriptions/${id}/execute`, {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                loadData();
+            } else {
+                const data = await res.json();
+                alert(data.error || "Error al ejecutar la recurrencia");
+            }
+        } catch (error) {
+            console.error("Error executing subscription:", error);
+            alert("Error de conexión al ejecutar la recurrencia");
+        }
+    };
+
     useEffect(() => {
         loadData();
     }, []);
@@ -70,7 +177,7 @@ export default function RecurringPage() {
         setLoading(true);
         try {
             const [recRes, accRes, catRes, freqRes] = await Promise.all([
-                fetch("/api/transactions/recurring"),
+                fetch("/api/subscriptions"),
                 fetch("/api/accounts"),
                 fetch("/api/categories"),
                 fetch("/api/frequencies")
@@ -83,12 +190,12 @@ export default function RecurringPage() {
                 freqRes.json()
             ]);
 
-            setRecurrences(recData);
+            setRecurrences(Array.isArray(recData) ? recData : []);
             setAccounts(accData);
             setCategories(catData);
             setFrequencies(Array.isArray(freqData) ? freqData : []);
         } catch (error) {
-            console.error("Error loading recurring transactions:", error);
+            console.error("Error loading subscriptions:", error);
         } finally {
             setLoading(false);
         }
@@ -103,8 +210,7 @@ export default function RecurringPage() {
             destinationAccountId: type === "TRASPASO" ? destinationAccountId : null,
             originAccountId: accountId,
             categoryId: type === "TRASPASO" ? null : categoryId,
-            date: new Date(nextDate).toISOString(),
-            isRecurring: true,
+            nextExecutionDate: new Date(nextDate).toISOString(),
             isPaused,
             frequencyId: (frequencyId && frequencyId !== "none") ? frequencyId : null,
             recurrencePeriod: (!frequencyId || frequencyId === "none") ? recurrencePeriod : null,
@@ -112,7 +218,7 @@ export default function RecurringPage() {
         };
 
         const method = editingTx ? "PUT" : "POST";
-        const url = editingTx ? `/api/transactions/${editingTx.id}` : "/api/transactions";
+        const url = editingTx ? `/api/subscriptions/${editingTx.id}` : "/api/subscriptions";
 
         const res = await fetch(url, {
             method,
@@ -128,16 +234,16 @@ export default function RecurringPage() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("¿Eliminar esta recurrencia? No se eliminarán los movimientos ya registrados.")) return;
-        const res = await fetch(`/api/transactions/${id}`, { method: "DELETE" });
+        if (!confirm("¿Eliminar esta recurrencia? Los movimientos generados anteriormente se mantendrán.")) return;
+        const res = await fetch(`/api/subscriptions/${id}`, { method: "DELETE" });
         if (res.ok) loadData();
     };
 
-    const handleTogglePause = async (tx: any) => {
-        const res = await fetch(`/api/transactions/${tx.id}`, {
+    const handleTogglePause = async (sub: any) => {
+        const res = await fetch(`/api/subscriptions/${sub.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...tx, isPaused: !tx.isPaused })
+            body: JSON.stringify({ isPaused: !sub.isPaused })
         });
         if (res.ok) loadData();
     };
@@ -157,24 +263,24 @@ export default function RecurringPage() {
         setNextDate(new Date().toISOString().split('T')[0]);
     };
 
-    const openEdit = (tx: any) => {
-        setEditingTx(tx);
-        setAmount(Math.abs(tx.amount).toString());
-        setDescription(tx.description || "");
-        setType(tx.type);
-        setAccountId(tx.accountId);
-        setDestinationAccountId(tx.destinationAccountId || "");
-        setCategoryId(tx.categoryId || "");
-        setIsPaused(tx.isPaused || false);
-        setFrequencyId(tx.frequencyId || "none");
-        setRecurrencePeriod(tx.recurrencePeriod || "MENSUAL");
-        setRecurrenceInterval(tx.recurrenceInterval || 1);
-        setNextDate(new Date(tx.date).toISOString().split('T')[0]);
+    const openEdit = (sub: any) => {
+        setEditingTx(sub);
+        setAmount(Math.abs(sub.amount).toString());
+        setDescription(sub.description || "");
+        setType(sub.type);
+        setAccountId(sub.accountId);
+        setDestinationAccountId(sub.destinationAccountId || "");
+        setCategoryId(sub.categoryId || "");
+        setIsPaused(sub.isPaused || false);
+        setFrequencyId(sub.frequencyId || "none");
+        setRecurrencePeriod(sub.recurrencePeriod || "MENSUAL");
+        setRecurrenceInterval(sub.recurrenceInterval || 1);
+        setNextDate(new Date(sub.nextExecutionDate).toISOString().split('T')[0]);
         setIsModalOpen(true);
     };
 
-    const calculateNextDate = (tx: any) => {
-        return new Date(tx.date);
+    const calculateNextDate = (sub: any) => {
+        return new Date(sub.nextExecutionDate);
     };
 
     const formattedNextDate = (date: Date) => {
@@ -207,6 +313,51 @@ export default function RecurringPage() {
                 </Button>
             </div>
 
+            {/* Bulk Actions Bar */}
+            {selectedIds.length > 0 && (
+                <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl flex items-center justify-between animate-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-4">
+                        <div onClick={toggleSelectAll} className="cursor-pointer">
+                            {selectedIds.length === recurrences.length ? (
+                                <CheckCircle className="w-5 h-5 text-primary" />
+                            ) : (
+                                <div className="w-5 h-5 border-2 border-primary/30 rounded-full flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-primary rounded-full" />
+                                </div>
+                            )}
+                        </div>
+                        <span className="text-sm font-bold text-primary uppercase tracking-widest">
+                            {selectedIds.length} Seleccionados
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsBulkEditModalOpen(true)}
+                            className="h-10 px-4 gap-2 text-[10px] font-black uppercase text-primary hover:bg-primary/20"
+                        >
+                            <Settings className="w-4 h-4" /> Editar Categoría/Cuenta
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            onClick={handleBulkDelete}
+                            disabled={isBulkDeleting}
+                            className="h-10 px-4 gap-2 text-[10px] font-black uppercase text-rose-500 hover:bg-rose-500/10"
+                        >
+                            {isBulkDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            Eliminar
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            onClick={() => setSelectedIds([])}
+                            className="h-10 w-10 p-0 text-slate-400 hover:text-black dark:hover:text-white"
+                        >
+                            <X className="w-5 h-5" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
             {/* List */}
             <div className="grid grid-cols-1 gap-4">
                 {loading ? (
@@ -225,12 +376,23 @@ export default function RecurringPage() {
                     recurrences.map((tx) => (
                         <Card key={tx.id} className={cn(
                             "group border-none shadow-sm dark:shadow-none transition-all duration-300 relative overflow-hidden",
-                            tx.isPaused ? "bg-slate-50 dark:bg-meta-4/10 opacity-70" : "bg-white dark:bg-boxdark hover:shadow-md"
+                            tx.isPaused ? "bg-slate-50 dark:bg-meta-4/10 opacity-70" : "bg-white dark:bg-boxdark hover:shadow-md",
+                            selectedIds.includes(tx.id) && "ring-2 ring-primary ring-inset"
                         )}>
                             <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: tx.category?.color || (tx.type === 'TRASPASO' ? '#3c50e0' : '#94a3b8') }} />
 
                             <div className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
                                 <div className="flex items-center gap-4 flex-1">
+                                    <div
+                                        onClick={() => toggleSelect(tx.id)}
+                                        className="cursor-pointer transition-all active:scale-90"
+                                    >
+                                        {selectedIds.includes(tx.id) ? (
+                                            <CheckCircle className="w-6 h-6 text-primary" />
+                                        ) : (
+                                            <Circle className="w-6 h-6 text-slate-300 dark:text-slate-700" />
+                                        )}
+                                    </div>
                                     <div className={cn(
                                         "flex h-12 w-12 shrink-0 items-center justify-center rounded-md text-sm font-bold border",
                                         tx.type === "INGRESO" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/10" :
@@ -271,10 +433,21 @@ export default function RecurringPage() {
                                     )}>
                                         {tx.type === "GASTO" ? "-" : tx.type === "INGRESO" ? "+" : ""}{formatCurrency(Math.abs(tx.amount))}
                                     </p>
-                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Importe por ciclo</span>
+                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                        {tx.recurrenceInterval} ejecuciones rest.
+                                    </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleExecute(tx.id)}
+                                        className="h-10 w-10 rounded-md bg-blue-50 dark:bg-blue-500/10 text-blue-500 border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20"
+                                        title="Ejecutar ahora"
+                                    >
+                                        <PlayCircle className="w-5 h-5" />
+                                    </Button>
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -408,7 +581,7 @@ export default function RecurringPage() {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Intervalo</Label>
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nº de Ejecuciones</Label>
                                     <Input
                                         type="number"
                                         value={recurrenceInterval}
@@ -416,6 +589,9 @@ export default function RecurringPage() {
                                         min="1"
                                         className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
                                     />
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 italic">
+                                        Se pausará tras llegar a 0.
+                                    </p>
                                 </div>
                             </div>
                         ) : null}
@@ -481,6 +657,66 @@ export default function RecurringPage() {
                         <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-md font-bold uppercase text-[10px] tracking-widest text-slate-400 h-12">Cancelar</Button>
                         <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-bold uppercase text-[10px] tracking-widest h-12 shadow-md border-none">
                             {editingTx ? "Actualizar" : "Activar"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Bulk Edit Modal */}
+            <Dialog open={isBulkEditModalOpen} onOpenChange={setIsBulkEditModalOpen}>
+                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden">
+                    <DialogHeader className="bg-primary p-8 text-white">
+                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">
+                            Edición Masiva
+                        </DialogTitle>
+                        <DialogDescription className="text-white/70 text-xs font-semibold uppercase tracking-widest italic">
+                            Actualizando {selectedIds.length} recurrencias seleccionadas
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="p-8 space-y-6">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nueva Categoría</Label>
+                                <Select value={bulkCategoryId} onValueChange={setBulkCategoryId}>
+                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold italic">
+                                        <SelectValue placeholder="Sin cambios" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                        {categories.map(cat => (
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    {cat.name}
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nueva Cuenta</Label>
+                                <Select value={bulkAccountId} onValueChange={setBulkAccountId}>
+                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold italic">
+                                        <SelectValue placeholder="Sin cambios" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                        {accounts.map(acc => (
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
+                        <Button variant="ghost" onClick={() => setIsBulkEditModalOpen(false)} className="flex-1 rounded-md font-bold uppercase text-[10px] tracking-widest text-slate-400 h-12">Cancelar</Button>
+                        <Button onClick={handleBulkUpdate} disabled={isBulkUpdating} className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-md font-bold uppercase text-[10px] tracking-widest h-12 shadow-md border-none">
+                            {isBulkUpdating ? "Actualizando..." : "Aplicar Cambios"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
