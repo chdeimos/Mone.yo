@@ -35,7 +35,10 @@ import {
     Pie,
     Cell,
     ResponsiveContainer,
-    Tooltip
+    Tooltip,
+    BarChart,
+    Bar,
+    ReferenceLine
 } from "recharts";
 
 export default function DashboardPage() {
@@ -229,61 +232,84 @@ export default function DashboardPage() {
                         <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Saldos en tiempo real</p>
                     </div>
 
-                    <div className="flex-1 relative min-h-[300px] flex items-center justify-center">
+                    <div className="flex-1 relative min-h-[300px] flex flex-col justify-center">
                         <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={stats.accounts?.map((acc: any) => ({
-                                        ...acc,
-                                        value: Number(acc.balance)
-                                    }))}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={90}
-                                    outerRadius={130}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                    nameKey="name"
-                                    animationBegin={200}
-                                    animationDuration={1500}
-                                >
-                                    {(stats.accounts || []).map((entry: any, index: number) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={entry.color || ["#3c50e0", "#80caee", "#10b981", "#f59e0b", "#ef4444"][index % 5]}
-                                            stroke="none"
-                                        />
-                                    ))}
-                                </Pie>
+                            <BarChart
+                                layout="vertical"
+                                data={[...(stats.accounts || [])].sort((a: any, b: any) => b.balance - a.balance)}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" className="dark:stroke-strokedark" />
+                                <XAxis type="number" hide />
+                                <YAxis
+                                    dataKey="name"
+                                    type="category"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    width={100}
+                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748B' }}
+                                />
                                 <Tooltip
+                                    cursor={{ fill: '#f1f5f9', opacity: 0.1 }}
                                     content={({ active, payload }: any) => {
                                         if (active && payload && payload.length) {
+                                            const data = payload[0].payload;
+                                            const isDebt = data.balance < 0;
                                             return (
-                                                <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-sm p-3 rounded-md border border-white/10 shadow-2xl">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{payload[0].name}</p>
-                                                    <p className="text-sm font-black text-white">{formatCurrency(payload[0].value)}</p>
+                                                <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-sm p-3 rounded-md border border-white/10 shadow-2xl min-w-[150px]">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{data.name}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className={`w-2 h-2 rounded-full ${isDebt ? 'bg-rose-500' : 'bg-emerald-500'}`} />
+                                                        <p className="text-sm font-black text-white">{formatCurrency(data.balance)}</p>
+                                                    </div>
+                                                    <p className={`text-[9px] font-bold mt-1 uppercase tracking-wider ${isDebt ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                                        {isDebt ? 'Pasivo (Deuda)' : 'Activo (Capital)'}
+                                                    </p>
                                                 </div>
                                             );
                                         }
                                         return null;
                                     }}
                                 />
-                            </PieChart>
+                                <ReferenceLine x={0} stroke="#94a3b8" strokeDasharray="3 3" />
+                                <Bar dataKey="balance" radius={[4, 4, 4, 4]} barSize={20}>
+                                    {(stats.accounts || []).map((entry: any, index: number) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={Number(entry.balance) >= 0 ? (entry.color || "#3c50e0") : "#f43f5e"}
+                                        />
+                                    ))}
+                                </Bar>
+                            </BarChart>
                         </ResponsiveContainer>
 
-                        {/* Center Text */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Patrimonio</span>
-                            <span className="text-2xl font-black text-black dark:text-white tracking-tighter">
-                                {formatCurrency(stats.accounts?.reduce((acc: number, curr: any) => acc + Number(curr.balance), 0))}
-                            </span>
+                        {/* Summary Footer */}
+                        <div className="flex justify-center gap-8 mt-4">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                <div>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Activos</p>
+                                    <p className="text-xs font-black text-emerald-500 leading-tight">
+                                        {formatCurrency(stats.accounts?.reduce((acc: number, cur: any) => Number(cur.balance) > 0 ? acc + Number(cur.balance) : acc, 0))}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-rose-500" />
+                                <div>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Pasivos</p>
+                                    <p className="text-xs font-black text-rose-500 leading-tight">
+                                        {formatCurrency(stats.accounts?.reduce((acc: number, cur: any) => Number(cur.balance) < 0 ? acc + Number(cur.balance) : acc, 0))}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="mt-8 flex justify-center relative z-10">
+                    <div className="mt-6 flex justify-center relative z-10">
                         <Link href="/accounts">
-                            <Button variant="outline" className="h-10 px-6 border-stroke dark:border-strokedark text-[11px] lg:text-[12px] font-black uppercase tracking-widest rounded-md hover:bg-slate-50 dark:hover:bg-meta-4">
-                                Detalles de Cuentas
+                            <Button variant="outline" className="h-9 px-6 border-stroke dark:border-strokedark text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-slate-50 dark:hover:bg-meta-4">
+                                Gestionar Cuentas
                             </Button>
                         </Link>
                     </div>

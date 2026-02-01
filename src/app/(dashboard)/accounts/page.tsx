@@ -48,6 +48,141 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+const AccountCard = ({
+    account,
+    onEdit,
+    onDelete,
+    onAdjust,
+    onToggleDashboard
+}: {
+    account: any,
+    onEdit: (acc: any, e: any) => void,
+    onDelete: (acc: any) => void,
+    onAdjust: (acc: any, e: React.MouseEvent) => void,
+    onToggleDashboard: (acc: any) => void
+}) => {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    return (
+        <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 hover:shadow-md transition-all group flex flex-col justify-between h-full relative overflow-hidden">
+            {/* Color strip */}
+            <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: account.color || '#3c50e0' }} />
+
+            <div>
+                <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center gap-4">
+                        <div
+                            className="w-12 h-12 rounded-md flex items-center justify-center text-slate-600 dark:text-white"
+                            style={{ backgroundColor: (account.color || '#3c50e0') + '15', color: account.color || '#3c50e0' }}
+                        >
+                            <Building2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <h4 className="font-bold text-black dark:text-white uppercase tracking-tight">{account.name}</h4>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{account.type?.name || "Cuenta"}</span>
+                        </div>
+                    </div>
+
+                    <Dialog open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild className="hidden md:flex">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-300 hover:text-primary">
+                                    <MoreVertical className="w-4 h-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="rounded-md border-stroke dark:border-strokedark bg-white dark:bg-boxdark shadow-lg">
+                                <DropdownMenuItem
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEdit(account, e);
+                                    }}
+                                    className="font-bold text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-meta-4 gap-2 cursor-pointer uppercase tracking-widest p-3"
+                                >
+                                    <Pencil className="w-3 h-3" /> Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDelete(account);
+                                    }}
+                                    className="font-bold text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 gap-2 cursor-pointer uppercase tracking-widest p-3"
+                                >
+                                    <Trash2 className="w-3 h-3" /> Eliminar
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-slate-300 hover:text-primary md:hidden"
+                            onClick={() => setIsMobileMenuOpen(true)}
+                        >
+                            <MoreVertical className="w-4 h-4" />
+                        </Button>
+
+                        <DialogContent className="w-screen max-w-none m-0 rounded-t-[20px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.2)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200] data-[state=closed]:slide-out-to-bottom data-[state=closed]:translate-y-0">
+                            <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-2" />
+
+                            <DialogHeader className="px-6 pb-2 text-left">
+                                <DialogTitle className="text-lg font-black uppercase text-slate-800 dark:text-white tracking-tight">Opciones</DialogTitle>
+                                <DialogDescription className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                                    Cuenta {account.name}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="flex flex-col p-4 gap-2 pb-8 overflow-y-auto flex-1 min-h-0">
+                                <Button onClick={(e) => { setIsMobileMenuOpen(false); onEdit(account, e); }} variant="outline" className="h-14 justify-start px-6 rounded-2xl gap-4 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-meta-4/30 hover:bg-slate-100 dark:hover:bg-meta-4/50 text-slate-700 dark:text-white font-bold uppercase tracking-widest text-xs shadow-sm">
+                                    <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><Pencil className="w-4 h-4" /></div> Editar Cuenta
+                                </Button>
+
+                                <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+
+                                <Button onClick={() => { setIsMobileMenuOpen(false); onDelete(account); }} variant="ghost" className="h-12 justify-center gap-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-black uppercase tracking-widest text-[10px]">
+                                    <Trash2 className="w-4 h-4" /> Eliminar Cuenta
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="flex justify-between items-baseline">
+                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Saldo Real</span>
+                        <span className={cn(
+                            "text-xl font-bold tracking-tight",
+                            (account.balance || 0) < 0 ? "text-rose-500" : "text-black dark:text-white"
+                        )}>
+                            {formatCurrency(account.balance || 0)}
+                        </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-2">
+                        <div className="flex items-center gap-2">
+                            <Switch
+                                checked={account.showOnDashboard ?? true}
+                                onCheckedChange={() => onToggleDashboard(account)}
+                                className="scale-75"
+                            />
+                            <span className="text-[10px] font-bold uppercase text-slate-400">Panel Principal</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-300">INI: {formatCurrency(account.initialBalance)}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-stroke dark:border-strokedark">
+                <Button
+                    variant="outline"
+                    className="w-full h-10 border-stroke dark:border-strokedark hover:bg-slate-50 dark:hover:bg-meta-4 text-xs font-bold uppercase tracking-widest rounded-md transition-all gap-2"
+                    onClick={(e) => onAdjust(account, e)}
+                >
+                    <ArrowUpRight className="w-3.5 h-3.5" /> Ajustar Saldo
+                </Button>
+            </div>
+        </Card>
+    );
+};
+
 export default function AccountsPage() {
     const [accounts, setAccounts] = useState<any[]>([]);
     const [accountTypes, setAccountTypes] = useState<any[]>([]);
@@ -485,92 +620,21 @@ export default function AccountsPage() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {accounts.map((acc) => (
-                            <Card key={acc.id} className="bg-white dark:bg-boxdark border-none shadow-sm p-6 hover:shadow-md transition-all group flex flex-col justify-between h-full relative overflow-hidden">
-                                {/* Color strip */}
-                                <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
-
-                                <div>
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="flex items-center gap-4">
-                                            <div
-                                                className="w-12 h-12 rounded-md flex items-center justify-center text-slate-600 dark:text-white"
-                                                style={{ backgroundColor: (acc.color || '#3c50e0') + '15', color: acc.color || '#3c50e0' }}
-                                            >
-                                                <Building2 className="w-6 h-6" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-black dark:text-white uppercase tracking-tight">{acc.name}</h4>
-                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{acc.type?.name || "Cuenta"}</span>
-                                            </div>
-                                        </div>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-300 hover:text-primary">
-                                                    <MoreVertical className="w-4 h-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" className="rounded-md border-stroke dark:border-strokedark bg-white dark:bg-boxdark shadow-lg">
-                                                <DropdownMenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setEditingAccount(acc);
-                                                        setName(acc.name);
-                                                        setBalance(acc.initialBalance.toString());
-                                                        setTypeId(acc.typeId);
-                                                        setColor(acc.color || "#3c50e0");
-                                                        setIsModalOpen(true);
-                                                    }}
-                                                    className="font-bold text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-meta-4 gap-2 cursor-pointer uppercase tracking-widest p-3"
-                                                >
-                                                    <Pencil className="w-3 h-3" /> Editar
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteAccount(acc);
-                                                    }}
-                                                    className="font-bold text-xs text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 gap-2 cursor-pointer uppercase tracking-widest p-3"
-                                                >
-                                                    <Trash2 className="w-3 h-3" /> Eliminar
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="flex justify-between items-baseline">
-                                            <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Saldo Real</span>
-                                            <span className={cn(
-                                                "text-xl font-bold tracking-tight",
-                                                (acc.balance || 0) < 0 ? "text-rose-500" : "text-black dark:text-white"
-                                            )}>
-                                                {formatCurrency(acc.balance || 0)}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between pt-2">
-                                            <div className="flex items-center gap-2">
-                                                <Switch
-                                                    checked={acc.showOnDashboard ?? true}
-                                                    onCheckedChange={() => handleToggleDashboard(acc)}
-                                                    className="scale-75"
-                                                />
-                                                <span className="text-[10px] font-bold uppercase text-slate-400">Panel Principal</span>
-                                            </div>
-                                            <span className="text-[10px] font-bold text-slate-300">INI: {formatCurrency(acc.initialBalance)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 pt-4 border-t border-stroke dark:border-strokedark">
-                                    <Button
-                                        variant="outline"
-                                        className="w-full h-10 border-stroke dark:border-strokedark hover:bg-slate-50 dark:hover:bg-meta-4 text-xs font-bold uppercase tracking-widest rounded-md transition-all gap-2"
-                                        onClick={(e) => openAdjustModal(acc, e)}
-                                    >
-                                        <ArrowUpRight className="w-3.5 h-3.5" /> Ajustar Saldo
-                                    </Button>
-                                </div>
-                            </Card>
+                            <AccountCard
+                                key={acc.id}
+                                account={acc}
+                                onEdit={(acc, e) => {
+                                    setEditingAccount(acc);
+                                    setName(acc.name);
+                                    setBalance(acc.initialBalance.toString());
+                                    setTypeId(acc.typeId);
+                                    setColor(acc.color || "#3c50e0");
+                                    setIsModalOpen(true);
+                                }}
+                                onDelete={handleDeleteAccount}
+                                onAdjust={openAdjustModal}
+                                onToggleDashboard={handleToggleDashboard}
+                            />
                         ))}
                     </div>
                 )}

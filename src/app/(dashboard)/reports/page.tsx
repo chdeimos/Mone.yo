@@ -388,12 +388,19 @@ export default function ReportsPage() {
                             <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Cuenta</Label>
                             <Select value={filterAccountId} onValueChange={setFilterAccountId}>
                                 <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
-                                    <SelectValue placeholder="Todas" />
+                                    <SelectValue placeholder="Todas">
+                                        {filterAccountId === "all" ? "Todas las Cuentas" : accounts.find(a => a.id === filterAccountId)?.name}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
                                     <SelectItem value="all" className="font-bold">Todas las Cuentas</SelectItem>
                                     {accounts.map(acc => (
-                                        <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                        <SelectItem key={acc.id} value={acc.id} className="font-bold">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
+                                                {acc.name}
+                                            </div>
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -402,12 +409,19 @@ export default function ReportsPage() {
                             <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Categoría</Label>
                             <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
                                 <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
-                                    <SelectValue placeholder="Todas" />
+                                    <SelectValue placeholder="Todas">
+                                        {filterCategoryId === "all" ? "Todas las Categorías" : categories.find(c => c.id === filterCategoryId)?.name}
+                                    </SelectValue>
                                 </SelectTrigger>
                                 <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
                                     <SelectItem value="all" className="font-bold">Todas las Categorías</SelectItem>
                                     {categories.map(cat => (
-                                        <SelectItem key={cat.id} value={cat.id} className="font-bold">{cat.name}</SelectItem>
+                                        <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                {cat.name}
+                                            </div>
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>

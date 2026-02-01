@@ -99,29 +99,6 @@ export function VisionResultModal({ isOpen, onClose, imageFile, imageFiles, anal
 
                 <div className="flex-1 overflow-y-auto p-8">
                     <div className={cn("grid gap-12 h-full", filesToDisplay.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
-                        {/* Document Preview */}
-                        {filesToDisplay.length > 0 && (
-                            <div className="bg-slate-50 dark:bg-meta-4/10 border border-slate-100 dark:border-strokedark rounded-xl p-4 flex flex-col gap-4 items-center relative min-h-[300px] overflow-y-auto max-h-[600px] shadow-inner">
-                                {filesToDisplay.map((file, index) => (
-                                    <div key={index} className="w-full shadow-lg rounded-xl overflow-hidden">
-                                        {file.type === 'application/pdf' ? (
-                                            <embed
-                                                src={URL.createObjectURL(file)}
-                                                type="application/pdf"
-                                                className="w-full h-[500px] bg-white"
-                                            />
-                                        ) : (
-                                            <img
-                                                src={URL.createObjectURL(file)}
-                                                alt={`Ticket part ${index + 1}`}
-                                                className="w-full object-contain bg-white"
-                                            />
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
                         {/* Form */}
                         <div className="space-y-6">
                             {/* Alert Warning */}
@@ -146,7 +123,7 @@ export function VisionResultModal({ isOpen, onClose, imageFile, imageFiles, anal
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Importe</Label>
                                     <div className="relative">
@@ -173,7 +150,7 @@ export function VisionResultModal({ isOpen, onClose, imageFile, imageFiles, anal
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Categoría IA</Label>
                                     <Select value={formData.categoryId} onValueChange={val => setFormData({ ...formData, categoryId: val })}>
@@ -207,6 +184,29 @@ export function VisionResultModal({ isOpen, onClose, imageFile, imageFiles, anal
                                 </div>
                             </div>
                         </div>
+
+                        {/* Document Preview */}
+                        {filesToDisplay.length > 0 && (
+                            <div className="bg-slate-50 dark:bg-meta-4/10 border border-slate-100 dark:border-strokedark rounded-xl p-4 flex flex-col gap-4 items-center relative min-h-[300px] overflow-y-auto max-h-[600px] shadow-inner">
+                                {filesToDisplay.map((file, index) => (
+                                    <div key={index} className="w-full shadow-lg rounded-xl overflow-hidden">
+                                        {file.type === 'application/pdf' ? (
+                                            <embed
+                                                src={URL.createObjectURL(file)}
+                                                type="application/pdf"
+                                                className="w-full h-[500px] bg-white"
+                                            />
+                                        ) : (
+                                            <img
+                                                src={URL.createObjectURL(file)}
+                                                alt={`Ticket part ${index + 1}`}
+                                                className="w-full object-contain bg-white"
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
