@@ -118,7 +118,9 @@ export function VisionUploader({ onImagesSelected, onImageSelected, onManualEntr
     return (
         <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <label htmlFor="file-upload" className="sr-only">Subir archivo</label>
                 <input
+                    id="file-upload"
                     type="file"
                     ref={fileInputRef}
                     className="hidden"
@@ -149,14 +151,15 @@ export function VisionUploader({ onImagesSelected, onImageSelected, onManualEntr
 
                 <Button
                     onClick={() => setIsMultiPartModalOpen(true)}
-                    className="h-32 flex flex-col gap-3 bg-white dark:bg-meta-4/10 border-2 border-dashed border-slate-200 dark:border-strokedark text-slate-500 hover:border-violet-500 hover:text-violet-600 rounded-xl shadow-sm hover:shadow-md transition-all group"
+                    className="h-32 flex flex-col gap-3 bg-white dark:bg-meta-4/10 border-2 border-dashed border-slate-200 dark:border-strokedark text-slate-500 hover:border-emerald-500 hover:text-emerald-600 rounded-xl shadow-sm hover:shadow-md transition-all group"
                     variant="ghost"
                 >
                     <Layers className="w-8 h-8 transition-transform group-hover:scale-110" />
                     <span className="font-black text-[10px] uppercase tracking-widest">Foto por Partes</span>
                 </Button>
 
-                <input type="file" ref={multiPartInputRef} className="hidden" accept="image/*,application/pdf" onChange={handleMultiPartFileChange} multiple />
+                <label htmlFor="multi-file-upload" className="sr-only">Subir múltiples partes</label>
+                <input id="multi-file-upload" type="file" ref={multiPartInputRef} className="hidden" accept="image/*,application/pdf" onChange={handleMultiPartFileChange} multiple />
 
                 <Button
                     onClick={onManualEntry}
@@ -220,7 +223,7 @@ export function VisionUploader({ onImagesSelected, onImageSelected, onManualEntr
                 <DialogContent className="sm:max-w-2xl bg-white dark:bg-boxdark border-none p-0 overflow-hidden flex flex-col max-h-[90vh]">
                     <DialogHeader className="p-8 bg-boxdark text-white shrink-0">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/10 rounded-lg text-violet-400">
+                            <div className="p-3 bg-white/10 rounded-lg text-emerald-400">
                                 <Layers className="w-5 h-5" />
                             </div>
                             <div>

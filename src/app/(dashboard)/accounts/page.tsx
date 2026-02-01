@@ -308,7 +308,7 @@ export default function AccountsPage() {
                 const typeColors: Record<string, string> = {
                     "Cuenta Corriente": "#3c50e0",
                     "Ahorro": "#10b981",
-                    "Inversión": "#8b5cf6",
+                    "Inversión": "#10b981",
                     "Tarjeta de Crédito": "#f59e0b",
                     "Efectivo": "#64748b"
                 };

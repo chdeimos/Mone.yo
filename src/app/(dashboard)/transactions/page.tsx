@@ -446,31 +446,61 @@ export default function TransactionsPage() {
         setIsModalOpen(true);
     }, [resetForm]);
 
-    const exportToCSV = () => {
-        if (transactions.length === 0) return;
-        const headers = ["Fecha", "Descripción", "Categoría", "Cuenta", "Tipo", "Importe", "Estado"];
-        const rows = transactions.map(tx => [
-            formatDate(tx.date),
-            tx.description,
-            tx.category?.name || "Global",
-            tx.account?.name || "Sin cuenta",
-            tx.type,
-            tx.amount,
-            tx.isVerified ? "Conciliado" : "Pendiente"
-        ]);
-        const csvContent = "\uFEFF" + [
-            headers.join(","),
-            ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
-        ].join("\n");
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `movimientos_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = "hidden";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const exportToCSV = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (debouncedSearchQuery) params.append("query", debouncedSearchQuery);
+            if (filterCategoryId !== "all") params.append("categoryId", filterCategoryId);
+            if (filterAccountId !== "all") params.append("accountId", filterAccountId);
+            if (filterType !== "all") params.append("type", filterType);
+            if (filterIsVerified === "verified") params.append("isVerified", "true");
+            if (filterIsVerified === "unverified") params.append("isVerified", "false");
+            if (filterMinAmount) params.append("minAmount", filterMinAmount);
+            if (filterMaxAmount) params.append("maxAmount", filterMaxAmount);
+            if (filterStartDate) params.append("startDate", filterStartDate);
+            if (filterEndDate) params.append("endDate", filterEndDate);
+
+            // KEY FIX: Fetch ALL records matching filters
+            params.append("limit", "all");
+
+            const res = await fetch(`/api/transactions?${params.toString()}`);
+            const data = await res.json();
+            const allTransactions = data.transactions || [];
+
+            if (allTransactions.length === 0) {
+                alert("No hay datos para exportar con los filtros actuales.");
+                return;
+            }
+
+            const headers = ["Fecha", "Descripción", "Categoría", "Cuenta", "Tipo", "Importe", "Estado"];
+            const rows = allTransactions.map((tx: any) => [
+                formatDate(tx.date),
+                tx.description,
+                tx.category?.name || "Global",
+                tx.account?.name || "Sin cuenta",
+                tx.type,
+                tx.amount,
+                tx.isVerified ? "Conciliado" : "Pendiente"
+            ]);
+
+            const csvContent = "\uFEFF" + [
+                headers.join(","),
+                ...rows.map((row: any[]) => row.map((cell: any) => `"${cell}"`).join(","))
+            ].join("\n");
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `movimientos_completo_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = "hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error("Error exporting CSV:", error);
+            alert("Error al exportar los datos. Por favor, inténtalo de nuevo.");
+        }
     };
 
     const handlePrint = () => {
@@ -940,6 +970,69 @@ export default function TransactionsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Image Viewer Modal */}
+            <Dialog open={!!viewingTx} onOpenChange={(open) => !open && setViewingTx(null)}>
+                <DialogContent className="sm:max-w-4xl bg-black/95 border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh]">
+                    <DialogHeader className="bg-transparent absolute top-0 left-0 right-0 z-50 p-4">
+                        <div className="flex justify-between items-center w-full">
+                            <DialogTitle className="text-white/90 text-sm font-bold uppercase tracking-widest drop-shadow-md">
+                                Adjuntos del Movimiento
+                            </DialogTitle>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setViewingTx(null)}
+                                className="text-white/70 hover:text-white hover:bg-white/10 rounded-full h-8 w-8"
+                            >
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    </DialogHeader>
+
+                    <div className="flex-1 overflow-y-auto p-4 pt-16 flex flex-col gap-8 items-center justify-center min-h-[300px]">
+                        {viewingTx?.images?.map((img: any, i: number) => (
+                            <img key={`img-${i}`} src={img.url} alt={`Adjunto ${i + 1}`} className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+                        ))}
+                        {viewingTx?.imageUrls?.map((url: string, i: number) => (
+                            <img key={`url-${i}`} src={url} alt={`Adjunto ${i + 1}`} className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+                        ))}
+                        {viewingTx?.attachmentPath && (
+                            <img src={viewingTx.attachmentPath} alt="Adjunto Principal" className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl" />
+                        )}
+                        {(!viewingTx?.images?.length && !viewingTx?.imageUrls?.length && !viewingTx?.attachmentPath) && (
+                            <div className="flex flex-col items-center gap-3 text-slate-500">
+                                <AlertCircle className="w-10 h-10 opacity-50" />
+                                <p className="font-medium">No se encontraron imágenes adjuntas</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <DialogFooter className="bg-white/5 border-t border-white/10 p-4 shrink-0">
+                        <div className="w-full flex justify-between items-center px-2">
+                            <div className="text-white/50 text-[10px] uppercase tracking-widest font-mono">
+                                {viewingTx?.id?.split('-')[0]}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    const link = document.createElement('a');
+                                    const url = viewingTx?.images?.[0]?.url || viewingTx?.imageUrls?.[0] || viewingTx?.attachmentPath;
+                                    if (url) {
+                                        link.href = url;
+                                        link.download = `adjunto-${viewingTx.id}`;
+                                        link.click();
+                                    }
+                                }}
+                                className="border-white/20 text-white hover:bg-white/10 h-8 text-[10px] font-bold uppercase tracking-widest gap-2 bg-transparent"
+                            >
+                                <Download className="w-3 h-3" /> Descargar
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
@@ -963,6 +1056,20 @@ const TransactionRow = memo(({ tx, isSelected, toggleSelect, handleToggleVerify,
                         <span style={{ color: tx.category?.color }}>{tx.category?.name || "Global"}</span>
                         <span>•</span>
                         <span style={{ color: tx.account?.color }}>{tx.account?.name}</span>
+                        {((tx.images && tx.images.length > 0) || tx.attachmentPath || (tx.imageUrls && tx.imageUrls.length > 0)) && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 ml-1 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-full shrink-0"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setViewingTx(tx);
+                                }}
+                                title="Ver adjuntos"
+                            >
+                                <Paperclip className="w-3 h-3" />
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

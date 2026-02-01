@@ -18,7 +18,8 @@ export async function GET() {
             configurations,
             transactionImages,
             systemLogs,
-            accessLogs
+            accessLogs,
+            subscriptions
         ] = await Promise.all([
             prisma.user.findMany(),
             prisma.accountType.findMany(),
@@ -31,7 +32,8 @@ export async function GET() {
             prisma.configuration.findMany(),
             prisma.transactionImage.findMany(),
             prisma.systemLog.findMany(),
-            prisma.accessLog.findMany()
+            prisma.accessLog.findMany(),
+            prisma.subscription.findMany()
         ]);
 
         console.log(`[BACKUP] Datos obtenidos: 
@@ -55,7 +57,8 @@ export async function GET() {
                 configurations,
                 transactionImages,
                 systemLogs,
-                accessLogs
+                accessLogs,
+                subscriptions
             }
         };
 
