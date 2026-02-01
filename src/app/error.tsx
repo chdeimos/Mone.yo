@@ -17,14 +17,14 @@ export default function GlobalError({
 
     // Registrar en base de datos interna
     fetch('/api/system-logs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            level: 'ERROR',
-            message: error.message,
-            stack: error.stack,
-            context: { digest: error.digest }
-        })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        level: 'ERROR',
+        message: error.message,
+        stack: error.stack,
+        context: { digest: error.digest }
+      })
     }).catch(e => console.error("Error al guardar log:", e));
   }, [error])
 
@@ -35,20 +35,20 @@ export default function GlobalError({
           <AlertTriangle className="w-12 h-12 text-rose-500" />
         </div>
         <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-100">
-            <span className="text-xl">😓</span>
+          <span className="text-xl">😓</span>
         </div>
       </div>
-      
+
       <div className="space-y-3 max-w-md">
         <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">¡Sistema Interrumpido!</h2>
-        <p className="text-slate-500 font-medium leading-relaxed">
+        <p className="text-muted-foreground font-medium leading-relaxed">
           Hemos detectado un error inesperado en el procesamiento de datos. No te preocupes, tu información financiera está segura.
         </p>
         {error.digest && (
-            <div className="mt-4 p-3 bg-slate-100 rounded-xl border border-slate-200">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ID de Referencia</p>
-                <p className="text-xs font-mono text-slate-600 break-all">{error.digest}</p>
-            </div>
+          <div className="mt-4 p-3 bg-slate-100 rounded-xl border border-slate-200">
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">ID de Referencia</p>
+            <p className="text-xs font-mono text-slate-600 break-all">{error.digest}</p>
+          </div>
         )}
       </div>
 
@@ -63,16 +63,16 @@ export default function GlobalError({
           <RefreshCcw className="w-4 h-4 mr-2" /> Reintentar
         </Button>
         <Button
-            variant="outline"
-            onClick={() => window.location.href = "/"}
-            className="flex-1 border-slate-200 hover:bg-white hover:text-orange-500 hover:border-orange-200 rounded-2xl font-bold h-14 transition-all"
+          variant="outline"
+          onClick={() => window.location.href = "/"}
+          className="flex-1 border-slate-200 hover:bg-white hover:text-orange-500 hover:border-orange-200 rounded-2xl font-bold h-14 transition-all"
         >
-            <Home className="w-4 h-4 mr-2" /> Ir al Inicio
+          <Home className="w-4 h-4 mr-2" /> Ir al Inicio
         </Button>
       </div>
-      
-      <p className="text-[10px] text-slate-400 font-medium">
-          Si el problema persiste, contacta con soporte.
+
+      <p className="text-[10px] text-muted-foreground font-medium">
+        Si el problema persiste, contacta con soporte.
       </p>
     </div>
   )

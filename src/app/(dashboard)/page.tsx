@@ -25,21 +25,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrency, formatDate, formatMonthYear } from "@/lib/utils";
 import Link from "next/link";
-import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    PieChart,
-    Pie,
-    Cell,
-    ResponsiveContainer,
-    Tooltip,
-    BarChart,
-    Bar,
-    ReferenceLine
-} from "recharts";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for charts to reduce initial bundle size
+const DashboardBarChart = dynamic(() => import("@/components/dashboard/DashboardBarChart"), {
+    ssr: false,
+    loading: () => <div className="w-full h-[300px] bg-slate-50 dark:bg-meta-4/10 animate-pulse rounded-xl" />
+});
+
+const DashboardPieChart = dynamic(() => import("@/components/dashboard/DashboardPieChart"), {
+    ssr: false,
+    loading: () => <div className="w-full h-[250px] bg-slate-50 dark:bg-meta-4/10 animate-pulse rounded-xl" />
+});
+
+const DashboardAreaChart = dynamic(() => import("@/components/dashboard/DashboardAreaChart"), {
+    ssr: false,
+    loading: () => <div className="w-full h-[350px] bg-slate-50 dark:bg-meta-4/10 animate-pulse rounded-xl" />
+});
 
 export default function DashboardPage() {
     const [stats, setStats] = useState<any>({
@@ -123,6 +125,15 @@ export default function DashboardPage() {
         );
     }
 
+    const sortedAccounts = [...(stats.accounts || [])].sort((a: any, b: any) => b.balance - a.balance);
+    const spendPercentage = stats.budgets?.length > 0
+        ? Math.round((stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.current), 0) / (stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.limit), 0) || 1)) * 100)
+        : 0;
+    const pieData = [
+        { name: 'Gastado', value: stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.current) || 0, 0) || 0 },
+        { name: 'Restante', value: Math.max(0, stats.budgets?.reduce((acc: number, b: any) => acc + (Number(b.limit) - Number(b.current)) || 0, 0)) || 1 }
+    ];
+
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {newRecurringCount > 0 && (
@@ -164,7 +175,7 @@ export default function DashboardPage() {
                             <Wallet className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Patrimonio Total</p>
+                            <p className="text-muted-foreground font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Patrimonio Total</p>
                             <h2 className="text-lg sm:text-2xl font-black text-[#3c50e0] dark:text-white tracking-tight leading-none">
                                 {formatCurrency(stats.totalBalance)}
                             </h2>
@@ -180,7 +191,7 @@ export default function DashboardPage() {
                             <ArrowDownLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Ingresos Mes</p>
+                            <p className="text-muted-foreground font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Ingresos Mes</p>
                             <h2 className="text-lg sm:text-2xl font-black tracking-tight text-emerald-500 leading-none">
                                 +{formatCurrency(stats.monthlyIncome)}
                             </h2>
@@ -196,7 +207,7 @@ export default function DashboardPage() {
                             <ArrowUpRight className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Gastos Mes</p>
+                            <p className="text-muted-foreground font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Gastos Mes</p>
                             <h2 className="text-lg sm:text-2xl font-black tracking-tight text-rose-500 leading-none">
                                 -{formatCurrency(stats.monthlyExpenses)}
                             </h2>
@@ -212,7 +223,7 @@ export default function DashboardPage() {
                             <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Cuentas Activas</p>
+                            <p className="text-muted-foreground font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Cuentas Activas</p>
                             <h2 className="text-lg sm:text-2xl font-black text-black dark:text-white tracking-tight leading-none">
                                 {stats.accounts.length}
                             </h2>
@@ -229,66 +240,18 @@ export default function DashboardPage() {
                 <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-8 min-h-[500px] flex flex-col relative overflow-hidden group">
                     <div className="w-full mb-8 relative z-10 text-center lg:text-left">
                         <h3 className="text-xl font-black text-black dark:text-white uppercase tracking-tight">Distribución de Patrimonio</h3>
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Saldos en tiempo real</p>
+                        <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mt-1">Saldos en tiempo real</p>
                     </div>
 
                     <div className="flex-1 relative min-h-[300px] flex flex-col justify-center">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart
-                                layout="vertical"
-                                data={[...(stats.accounts || [])].sort((a: any, b: any) => b.balance - a.balance)}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" className="dark:stroke-strokedark" />
-                                <XAxis type="number" hide />
-                                <YAxis
-                                    dataKey="name"
-                                    type="category"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    width={isMobile ? 65 : 100}
-                                    tick={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, fill: '#64748B' }}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: '#f1f5f9', opacity: 0.1 }}
-                                    content={({ active, payload }: any) => {
-                                        if (active && payload && payload.length) {
-                                            const data = payload[0].payload;
-                                            const isDebt = data.balance < 0;
-                                            return (
-                                                <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-sm p-3 rounded-md border border-white/10 shadow-2xl min-w-[150px]">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{data.name}</p>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-2 h-2 rounded-full ${isDebt ? 'bg-rose-500' : 'bg-emerald-500'}`} />
-                                                        <p className="text-sm font-black text-white">{formatCurrency(data.balance)}</p>
-                                                    </div>
-                                                    <p className={`text-[9px] font-bold mt-1 uppercase tracking-wider ${isDebt ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                                        {isDebt ? 'Pasivo (Deuda)' : 'Activo (Capital)'}
-                                                    </p>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    }}
-                                />
-                                <ReferenceLine x={0} stroke="#94a3b8" strokeDasharray="3 3" />
-                                <Bar dataKey="balance" radius={[4, 4, 4, 4]} barSize={20}>
-                                    {(stats.accounts || []).map((entry: any, index: number) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={Number(entry.balance) >= 0 ? (entry.color || "#3c50e0") : "#f43f5e"}
-                                        />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
+                        <DashboardBarChart data={sortedAccounts} isMobile={isMobile} />
 
                         {/* Summary Footer */}
                         <div className="flex justify-center gap-8 mt-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Activos</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Activos</p>
                                     <p className="text-xs font-black text-emerald-500 leading-tight">
                                         {formatCurrency(stats.accounts?.reduce((acc: number, cur: any) => Number(cur.balance) > 0 ? acc + Number(cur.balance) : acc, 0))}
                                     </p>
@@ -297,7 +260,7 @@ export default function DashboardPage() {
                             <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full bg-rose-500" />
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Pasivos</p>
+                                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Pasivos</p>
                                     <p className="text-xs font-black text-rose-500 leading-tight">
                                         {formatCurrency(stats.accounts?.reduce((acc: number, cur: any) => Number(cur.balance) < 0 ? acc + Number(cur.balance) : acc, 0))}
                                     </p>
@@ -320,60 +283,18 @@ export default function DashboardPage() {
                 <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-8 min-h-[500px] flex flex-col relative overflow-hidden group font-sans">
                     <div className="w-full mb-8 relative z-10 text-center lg:text-left">
                         <h3 className="text-xl font-black text-black dark:text-white uppercase tracking-tight">Presupuesto Mensual</h3>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">
                             {formatMonthYear(new Date()).toUpperCase()}
                         </p>
                     </div>
 
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 items-center relative z-10">
-                        {/* Donut Chart */}
-                        <div className="h-[250px] relative">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={[
-                                            { name: 'Gastado', value: stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.current) || 0, 0) || 0 },
-                                            { name: 'Restante', value: Math.max(0, stats.budgets?.reduce((acc: number, b: any) => acc + (Number(b.limit) - Number(b.current)) || 0, 0)) || 1 }
-                                        ]}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={70}
-                                        outerRadius={95}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        animationBegin={400}
-                                        animationDuration={1500}
-                                    >
-                                        <Cell fill="#ef4444" stroke="none" />
-                                        <Cell fill="#10b981" stroke="none" className="opacity-20" />
-                                    </Pie>
-                                    <Tooltip
-                                        content={({ active, payload }: any) => {
-                                            if (active && payload && payload.length) {
-                                                return (
-                                                    <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-sm p-3 rounded-md border border-white/10 shadow-2xl">
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{payload[0].name}</p>
-                                                        <p className="text-sm font-black text-white">{formatCurrency(payload[0].value)}</p>
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gasto Total</span>
-                                <span className="text-xl font-black text-black dark:text-white tracking-tighter">
-                                    {stats.budgets?.length > 0 ? Math.round((stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.current), 0) / (stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.limit), 0) || 1)) * 100) : 0}%
-                                </span>
-                            </div>
-                        </div>
+                        <DashboardPieChart data={pieData} percentage={spendPercentage} />
 
                         {/* Insights Panel */}
                         <div className="space-y-4">
                             <div className="p-4 rounded-xl bg-slate-50 dark:bg-meta-4/10 border border-stroke dark:border-strokedark">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2 text-left">
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-3 flex items-center gap-2 text-left">
                                     <Sparkles className="w-3 h-3 text-primary" /> Sugerencia IA
                                 </p>
 
@@ -416,13 +337,13 @@ export default function DashboardPage() {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="p-3 rounded-lg bg-slate-50 dark:bg-meta-4/10">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 text-left">Límite Total</p>
+                                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1 text-left">Límite Total</p>
                                     <p className="text-[11px] font-black text-black dark:text-white text-left">
                                         {formatCurrency(stats.budgets?.reduce((acc: number, b: any) => acc + Number(b.limit), 0))}
                                     </p>
                                 </div>
                                 <div className="p-3 rounded-lg bg-slate-50 dark:bg-meta-4/10">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 text-left">Disponible</p>
+                                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1 text-left">Disponible</p>
                                     <p className="text-[11px] font-black text-emerald-500 text-left">
                                         {formatCurrency(Math.max(0, stats.budgets?.reduce((acc: number, b: any) => acc + (Number(b.limit) - Number(b.current)), 0)))}
                                     </p>
@@ -447,7 +368,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 relative z-10">
                     <div>
                         <h3 className="text-xl font-black text-black dark:text-white uppercase tracking-tight">Evolución de Patrimonio</h3>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Histórico de balance consolidado</p>
+                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mt-1">Histórico de balance consolidado</p>
                     </div>
                     <div className="flex items-center bg-slate-50 dark:bg-meta-4/20 p-1 rounded-lg border border-stroke dark:border-strokedark self-start">
                         {[
@@ -464,7 +385,7 @@ export default function DashboardPage() {
                                     "px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-md transition-all",
                                     historyPeriod === p.value
                                         ? "bg-white dark:bg-boxdark text-primary shadow-sm ring-1 ring-black/5"
-                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                        : "text-muted-foreground hover:text-slate-600 dark:hover:text-slate-200"
                                 )}
                             >
                                 {p.label}
@@ -479,60 +400,7 @@ export default function DashboardPage() {
                             <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
                         </div>
                     )}
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={historyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                            <defs>
-                                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#3c50e0" stopOpacity={0.15} />
-                                    <stop offset="95%" stopColor="#3c50e0" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
-                            <XAxis
-                                dataKey="date"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 10, fontWeight: 700, fill: '#64748B' }}
-                                dy={10}
-                                interval="preserveStartEnd"
-                            />
-                            <YAxis
-                                hide={isMobile}
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 10, fontWeight: 700, fill: '#64748B' }}
-                                tickFormatter={(val) => `€${val >= 1000 ? (val / 1000).toFixed(1) + 'k' : val}`}
-                            />
-                            <Tooltip
-                                content={({ active, payload }: any) => {
-                                    if (active && payload && payload.length) {
-                                        return (
-                                            <div className="bg-slate-900/95 dark:bg-black/95 backdrop-blur-sm p-4 rounded-lg border border-white/10 shadow-2xl">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">{payload[0].payload.date}</p>
-                                                <p className="text-lg font-black text-white">{formatCurrency(payload[0].value)}</p>
-                                                <div className="mt-2 pt-2 border-t border-white/5">
-                                                    <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-1">
-                                                        <TrendingUp className="w-3 h-3" /> Tendencia Activa
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                }}
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="value"
-                                stroke="#3c50e0"
-                                strokeWidth={3}
-                                fillOpacity={1}
-                                fill="url(#colorValue)"
-                                animationDuration={1500}
-                                animationBegin={300}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                    <DashboardAreaChart data={historyData} isMobile={isMobile} />
                 </div>
             </Card>
 
@@ -541,7 +409,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h3 className="text-xl font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">Últimos Movimientos</h3>
-                        <p className="text-xs font-black uppercase text-slate-400 tracking-widest leading-none">Actividad reciente en tus cuentas</p>
+                        <p className="text-xs font-black uppercase text-muted-foreground tracking-widest leading-none">Actividad reciente en tus cuentas</p>
                     </div>
                     <Link href="/transactions">
                         <Button variant="ghost" className="text-primary font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-primary/5 min-h-[44px]">
@@ -568,7 +436,7 @@ export default function DashboardPage() {
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-bold text-black dark:text-white uppercase tracking-tight truncate">{tx.description}</p>
                                         <div className="flex items-center gap-2 mt-0.5 min-w-0">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 shrink-0">{formatDate(tx.date)}</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground shrink-0">{formatDate(tx.date)}</span>
                                             <span className="text-slate-300 dark:text-slate-700 font-bold">•</span>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-primary truncate">{tx.category?.name || "Global"}</span>
                                             {tx.isVerified ? (
@@ -588,14 +456,14 @@ export default function DashboardPage() {
                                     )}>
                                         {tx.type === 'INGRESO' ? '+' : tx.type === 'GASTO' ? '-' : ''}{formatCurrency(tx.amount)}
                                     </p>
-                                    <p className="text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-slate-400 mt-0.5">{tx.account?.name}</p>
+                                    <p className="text-[10px] lg:text-[11px] font-black uppercase tracking-widest text-muted-foreground mt-0.5">{tx.account?.name}</p>
                                 </div>
                             </div>
                         ))
                     ) : (
                         <div className="py-20 text-center">
                             <ArrowLeftRight className="w-12 h-12 text-slate-200 dark:text-slate-800 mx-auto mb-4" />
-                            <p className="text-xs font-black uppercase text-slate-400 tracking-widest leading-none">No hay transacciones registradas</p>
+                            <p className="text-xs font-black uppercase text-muted-foreground tracking-widest leading-none">No hay transacciones registradas</p>
                         </div>
                     )}
                 </div>

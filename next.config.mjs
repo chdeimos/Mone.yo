@@ -1,6 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
+
+    // Compiler optimizations
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production' ? {
+            exclude: ['error', 'warn'],
+        } : false,
+    },
+
+    // Image optimization
+    images: {
+        formats: ['image/webp', 'image/avif'],
+        deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    },
+
     // Security Headers
     async headers() {
         return [
@@ -35,10 +50,17 @@ const nextConfig = {
             }
         ]
     },
+
     experimental: {
-        // Optimization for large pages if needed
-        optimizePackageImports: ['lucide-react', 'recharts'],
-    }
+        // Optimization for large packages
+        optimizePackageImports: ['lucide-react', 'recharts', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+        // Enable optimistic client cache
+        optimisticClientCache: true,
+    },
+
+    // Production optimizations
+    swcMinify: true,
+    poweredByHeader: false,
 };
 
 export default nextConfig;

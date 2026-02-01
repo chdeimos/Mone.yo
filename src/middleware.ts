@@ -113,6 +113,9 @@ export default withAuth(
     callbacks: {
       authorized: ({ token }) => !!token,
     },
+    pages: {
+      signIn: "/login",
+    },
   }
 );
 
@@ -126,6 +129,6 @@ export const config = {
      * - login (login page)
      * - public files (logo.png, etc.)
      */
-    "/((?!_next/static|_next/image|favicon.ico|login|logo.png|manifest.json|sw.js).*)",
+    "/((?!_next/static|_next/image|favicon.ico|login|logo.png|manifest.json|sw.js|robots.txt).*)",
   ],
 };

@@ -1,24 +1,28 @@
-import React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
     className?: string;
     iconOnly?: boolean;
     dark?: boolean;
+    priority?: boolean;
 }
 
-export function Logo({ className, iconOnly = false, dark = false }: LogoProps) {
+export function Logo({ className, iconOnly = false, dark = false, priority = false }: LogoProps) {
     return (
         <div className={cn("flex items-center gap-3 select-none", className)}>
             <div className={cn(
                 "relative flex items-center justify-center transition-all duration-300 overflow-hidden",
                 iconOnly ? "w-14 h-14" : "w-10 h-10"
             )}>
-                {/* Brand Mark: Using the custom image provided by the user */}
-                <img
+                {/* Brand Mark: Using the custom image provided by the user with Next.js Optimization */}
+                <Image
                     src="/logo.png"
                     alt="Mone.yo Logo"
-                    className="w-full h-full object-contain filter drop-shadow-md"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 56px"
+                    priority={priority}
+                    className="object-contain filter drop-shadow-md"
                 />
             </div>
 

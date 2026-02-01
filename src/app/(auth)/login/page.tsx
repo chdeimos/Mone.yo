@@ -64,10 +64,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+        <main className="min-h-screen bg-background flex items-center justify-center p-6">
             <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in duration-500">
                 <div className="flex flex-col items-center text-center space-y-4">
-                    <Logo iconOnly className="w-24 h-24 mb-2 drop-shadow-2xl" />
+                    <Logo iconOnly className="w-24 h-24 mb-2 drop-shadow-2xl" priority={true} />
                     <div className="space-y-1">
                         <h1 className="text-4xl font-black tracking-tighter italic text-foreground uppercase">
                             <span className="text-[#3c50e0]">Mone</span><span className="text-[#10b981]">.yo</span>
@@ -149,7 +149,7 @@ export default function LoginPage() {
                                         <button
                                             type="button"
                                             onClick={() => setShow2FA(false)}
-                                            className="text-[9px] font-bold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors w-full pt-1"
+                                            className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest hover:text-slate-600 transition-colors w-full pt-1"
                                         >
                                             Volver al inicio de sesión
                                         </button>
@@ -179,6 +179,6 @@ export default function LoginPage() {
                     Mone.yo • Chdeimos • v2.0.4
                 </p>
             </div>
-        </div>
+        </main>
     );
 }
