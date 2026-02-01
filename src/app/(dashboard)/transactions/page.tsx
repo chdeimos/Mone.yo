@@ -531,23 +531,7 @@ export default function TransactionsPage() {
 
     return (
         <div className="space-y-6 print-content">
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media print {
-                    @page { size: A4; margin: 0 !important; }
-                    html, body { background-color: white !important; color: black !important; font-size: 8pt !important; margin: 0 !important; width: 100% !important; }
-                    .no-print, .Sub-Header-Actions, aside, nav, header, button, .actions-cell, .dropdown-trigger { display: none !important; }
-                    .grid { display: grid !important; }
-                    .md\\:grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)) !important; }
-                    .md\\:col-span-2 { grid-column: span 2 / span 2 !important; }
-                    .md\\:col-span-5 { grid-column: span 5 / span 5 !important; }
-                    .col-span-3 { grid-column: span 3 / span 3 !important; }
-                    .Card { border: none !important; border-bottom: 1px solid #eee !important; box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0.2cm !important; border-radius: 0 !important; }
-                    .print-content { padding: 0.5cm !important; }
-                    .print-label { display: inline !important; font-size: 7pt !important; font-weight: bold !important; color: #555 !important; margin-left: 2px; }
-                    .print-marker { display: block !important; font-size: 8pt !important; text-align: center; font-weight: bold; }
-                }
-            `}} />
+
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in duration-500 mb-6 font-primary">
                 <div>

@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/components/AuthProvider";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,17 +36,18 @@ export default function RootLayout({
                         </LanguageProvider>
                     </AuthProvider>
                 </ThemeProvider>
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw.js');
-                });
-            }
-            `,
-                    }}
-                />
+                <Script
+                    id="service-worker-registration"
+                    strategy="afterInteractive"
+                >
+                    {`
+                    if ('serviceWorker' in navigator) {
+                        window.addEventListener('load', function() {
+                            navigator.serviceWorker.register('/sw.js');
+                        });
+                    }
+                    `}
+                </Script>
             </body>
         </html>
     );
