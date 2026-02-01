@@ -36,9 +36,10 @@ export default function VisionPage() {
             const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
             const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-            const [txRes, budgetRes] = await Promise.all([
+            const [txRes, budgetRes, recentRes] = await Promise.all([
                 fetch(`/api/transactions?startDate=${startOfMonth}&endDate=${endOfMonth}`),
-                fetch("/api/budgets")
+                fetch("/api/budgets"),
+                fetch("/api/transactions?sortBy=createdAt&sortOrder=desc&limit=5")
             ]);
 
             if (txRes.ok && budgetRes.ok) {
@@ -46,9 +47,17 @@ export default function VisionPage() {
                 const txData = rawTxData.transactions || (Array.isArray(rawTxData) ? rawTxData : []);
                 const budgetData = await budgetRes.json();
 
-                if (Array.isArray(txData)) {
-                    setRecentTx(txData.slice(0, 10));
+                // Handle Recent Scans independently
+                if (recentRes.ok) {
+                    const rawRecent = await recentRes.json();
+                    const recentData = rawRecent.transactions || (Array.isArray(rawRecent) ? rawRecent : []);
+                    setRecentTx(recentData);
+                } else {
+                    // Fallback to monthly data slice if distinct fetch fails
+                    setRecentTx(txData.slice(0, 5));
                 }
+
+                // (Legacy slice removed, using distinct fetch)
 
                 if (Array.isArray(budgetData) && Array.isArray(txData)) {
                     // Filter budgets for current month

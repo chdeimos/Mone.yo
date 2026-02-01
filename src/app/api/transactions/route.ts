@@ -24,7 +24,7 @@ export async function GET(req: Request) {
         const sortOrder = searchParams.get("sortOrder") || "desc";
 
         // Validate sortBy field to prevent errors
-        const validSortFields = ["date", "amount", "description", "isVerified"];
+        const validSortFields = ["date", "amount", "description", "isVerified", "createdAt"];
         const actualSortBy = validSortFields.includes(sortBy) ? sortBy : "date";
         const actualSortOrder = sortOrder === "asc" ? "asc" : "desc";
 

@@ -126,46 +126,46 @@ export default function DashboardPage() {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             {newRecurringCount > 0 && (
-                <div className="bg-[#E1E7FF] dark:bg-[#2F374F] border border-[#BAC8FF] dark:border-[#3D4D77] p-4 rounded-md flex items-center justify-between shadow-sm">
+                <div className="bg-[#E1E7FF] dark:bg-[#2F374F] border border-[#BAC8FF] dark:border-[#3D4D77] p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between shadow-sm gap-4">
                     <div className="flex items-center gap-4">
-                        <div className="p-2 bg-primary/10 rounded-md">
-                            <Repeat className="w-6 h-6 text-primary" />
+                        <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                            <Repeat className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <p className="font-bold text-sm text-primary uppercase tracking-wide">Actualización Automática</p>
-                            <p className="text-xs text-bodydark dark:text-bodydark1 font-medium italic">Se han generado {newRecurringCount} nuevos movimientos recurrentes hoy.</p>
+                            <p className="font-bold text-sm text-primary uppercase tracking-wide leading-tight">Actualización Automática</p>
+                            <p className="text-xs text-bodydark dark:text-bodydark1 font-medium italic mt-1">Se han generado {newRecurringCount} nuevos movimientos recurrentes hoy.</p>
                         </div>
                     </div>
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setNewRecurringCount(0)}
-                        className="text-primary hover:bg-primary/5"
+                        className="text-primary hover:bg-primary/5 w-full sm:w-auto h-11 sm:h-9 font-bold"
                     >
-                        Ocultar
+                        Ocultar Aviso
                     </Button>
                 </div>
             )}
 
-            {/* Breadcrumbs Placeholder for TailAdmin Look */}
+            {/* Breadcrumbs Placeholder */}
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-bold text-black dark:text-white">Dashboard</h1>
-                <nav className="text-sm font-semibold text-slate-500 uppercase tracking-widest">
+                <h1 className="text-2xl font-black text-black dark:text-white uppercase tracking-tight">Dashboard</h1>
+                <nav className="text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:block">
                     Mone.yo / <span className="text-primary">Estadísticas del Sistema</span>
                 </nav>
             </div>
 
             {/* Data Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {/* Patrimonio Total */}
-                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 relative overflow-hidden group">
-                    <div className="flex items-center gap-4 relative z-10">
-                        <div className="p-3 bg-[#3c50e0] rounded-lg text-white shadow-sm">
-                            <Wallet className="w-6 h-6" />
+                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-4 sm:p-6 relative overflow-hidden group">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+                        <div className="p-2.5 sm:p-3 bg-[#3c50e0] rounded-lg text-white shadow-sm w-fit">
+                            <Wallet className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[11px] lg:text-[13px] tracking-widest mb-1">Patrimonio Total</p>
-                            <h2 className="text-2xl font-black text-[#3c50e0] dark:text-white tracking-tight">
+                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Patrimonio Total</p>
+                            <h2 className="text-lg sm:text-2xl font-black text-[#3c50e0] dark:text-white tracking-tight leading-none">
                                 {formatCurrency(stats.totalBalance)}
                             </h2>
                         </div>
@@ -174,14 +174,14 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Ingresos Mes */}
-                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 relative overflow-hidden group">
-                    <div className="flex items-center gap-4 relative z-10">
-                        <div className="p-3 rounded-lg bg-emerald-500 text-white shadow-sm">
-                            <ArrowDownLeft className="w-6 h-6" />
+                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-4 sm:p-6 relative overflow-hidden group">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+                        <div className="p-2.5 sm:p-3 rounded-lg bg-emerald-500 text-white shadow-sm w-fit">
+                            <ArrowDownLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[11px] lg:text-[13px] tracking-widest mb-1">Ingresos Mes</p>
-                            <h2 className="text-2xl font-black tracking-tight text-emerald-500">
+                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Ingresos Mes</p>
+                            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-emerald-500 leading-none">
                                 +{formatCurrency(stats.monthlyIncome)}
                             </h2>
                         </div>
@@ -190,14 +190,14 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Gastos Mes */}
-                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 relative overflow-hidden group">
-                    <div className="flex items-center gap-4 relative z-10">
-                        <div className="p-3 rounded-lg bg-rose-500 text-white shadow-sm">
-                            <ArrowUpRight className="w-6 h-6" />
+                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-4 sm:p-6 relative overflow-hidden group">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+                        <div className="p-2.5 sm:p-3 rounded-lg bg-rose-500 text-white shadow-sm w-fit">
+                            <ArrowUpRight className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[11px] lg:text-[13px] tracking-widest mb-1">Gastos Mes</p>
-                            <h2 className="text-2xl font-black tracking-tight text-rose-500">
+                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Gastos Mes</p>
+                            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-rose-500 leading-none">
                                 -{formatCurrency(stats.monthlyExpenses)}
                             </h2>
                         </div>
@@ -206,14 +206,14 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Cuentas Activas */}
-                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 relative overflow-hidden group">
-                    <div className="flex items-center gap-4 relative z-10">
-                        <div className="p-3 bg-slate-800 dark:bg-meta-4 rounded-lg text-white shadow-sm">
-                            <CheckCircle2 className="w-6 h-6" />
+                <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-4 sm:p-6 relative overflow-hidden group">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 relative z-10">
+                        <div className="p-2.5 sm:p-3 bg-slate-800 dark:bg-meta-4 rounded-lg text-white shadow-sm w-fit">
+                            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
                         <div>
-                            <p className="text-slate-400 font-black uppercase text-[11px] lg:text-[13px] tracking-widest mb-1">Cuentas Activas</p>
-                            <h2 className="text-2xl font-black text-black dark:text-white tracking-tight">
+                            <p className="text-slate-400 font-black uppercase text-[9px] sm:text-[11px] lg:text-[13px] tracking-widest mb-0.5 sm:mb-1">Cuentas Activas</p>
+                            <h2 className="text-lg sm:text-2xl font-black text-black dark:text-white tracking-tight leading-none">
                                 {stats.accounts.length}
                             </h2>
                         </div>
@@ -246,8 +246,8 @@ export default function DashboardPage() {
                                     type="category"
                                     axisLine={false}
                                     tickLine={false}
-                                    width={100}
-                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748B' }}
+                                    width={isMobile ? 65 : 100}
+                                    tick={{ fontSize: isMobile ? 9 : 10, fontWeight: 700, fill: '#64748B' }}
                                 />
                                 <Tooltip
                                     cursor={{ fill: '#f1f5f9', opacity: 0.1 }}
@@ -544,7 +544,7 @@ export default function DashboardPage() {
                         <p className="text-xs font-black uppercase text-slate-400 tracking-widest leading-none">Actividad reciente en tus cuentas</p>
                     </div>
                     <Link href="/transactions">
-                        <Button variant="ghost" className="text-primary font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-primary/5 h-9">
+                        <Button variant="ghost" className="text-primary font-black uppercase tracking-widest text-[10px] gap-2 hover:bg-primary/5 min-h-[44px]">
                             Ver Todo <ArrowRight className="w-3 h-3" />
                         </Button>
                     </Link>
@@ -553,10 +553,10 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                     {stats.recentTransactions && stats.recentTransactions.length > 0 ? (
                         stats.recentTransactions.slice(0, 5).map((tx: any) => (
-                            <div key={tx.id} className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-meta-4/10 transition-colors group/row border border-transparent hover:border-stroke dark:hover:border-strokedark">
-                                <div className="flex items-center gap-4">
+                            <div key={tx.id} className="flex items-center justify-between p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-meta-4/10 transition-colors group/row border border-transparent hover:border-stroke dark:hover:border-strokedark gap-3">
+                                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden min-w-0 flex-1">
                                     <div className={cn(
-                                        "w-10 h-10 rounded-lg flex items-center justify-center transition-all",
+                                        "w-10 h-10 rounded-lg flex items-center justify-center transition-all shrink-0",
                                         tx.type === 'INGRESO' ? "bg-emerald-500/10 text-emerald-500" :
                                             tx.type === 'GASTO' ? "bg-rose-500/10 text-rose-500" :
                                                 "bg-blue-500/10 text-blue-500"
@@ -565,21 +565,21 @@ export default function DashboardPage() {
                                             tx.type === 'GASTO' ? <ArrowUpRight className="w-5 h-5" /> :
                                                 <ArrowLeftRight className="w-5 h-5" />}
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-black dark:text-white uppercase tracking-tight">{tx.description}</p>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{formatDate(tx.date)}</span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-sm font-bold text-black dark:text-white uppercase tracking-tight truncate">{tx.description}</p>
+                                        <div className="flex items-center gap-2 mt-0.5 min-w-0">
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 shrink-0">{formatDate(tx.date)}</span>
                                             <span className="text-slate-300 dark:text-slate-700 font-bold">•</span>
-                                            <span className="text-[9px] font-black uppercase tracking-widest text-primary">{tx.category?.name || "Global"}</span>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-primary truncate">{tx.category?.name || "Global"}</span>
                                             {tx.isVerified ? (
-                                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                                                <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500 shrink-0" />
                                             ) : (
-                                                <AlertTriangle className="w-2.5 h-2.5 text-amber-500" />
+                                                <AlertTriangle className="w-2.5 h-2.5 text-amber-500 shrink-0" />
                                             )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
+                                <div className="text-right shrink-0">
                                     <p className={cn(
                                         "text-base font-black tracking-tight",
                                         tx.type === 'INGRESO' ? "text-emerald-500" :
