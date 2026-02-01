@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { VisionUploader } from "@/components/VisionUploader";
 import { VisionResultModal } from "@/components/VisionResultModal";
+import AIAnalyzingLoader from "@/components/AIAnalyzingLoader";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 
@@ -201,11 +202,10 @@ export default function VisionPage() {
             </div>
 
             {isAnalyzing && (
-                <div className="fixed inset-0 bg-white/80 dark:bg-boxdark/80 backdrop-blur-sm z-[999] flex flex-col items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-slate-100 dark:border-strokedark border-t-[#3c50e0] rounded-full animate-spin mb-6" />
-                    <p className="text-xs font-black uppercase tracking-[0.2em] text-[#3c50e0] animate-pulse">Analizando con Gemini AI</p>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-2">Extrayendo datos y categorizando...</p>
-                </div>
+                <AIAnalyzingLoader
+                    message="La inteligencia artificial está analizando el documento"
+                    submessage="Extrayendo datos y categorizando..."
+                />
             )}
 
             {/* Stats Cards */}

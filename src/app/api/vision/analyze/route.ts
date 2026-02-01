@@ -13,13 +13,22 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No images provided" }, { status: 400 });
         }
 
+        // Validate Gemini API Key
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("❌ GEMINI_API_KEY is not configured in environment variables");
+            return NextResponse.json({
+                error: "AI service not configured. Please set GEMINI_API_KEY in environment variables."
+            }, { status: 500 });
+        }
+
         // Get Configuration
         const config = await prisma.configuration.findUnique({
             where: { id: "global" }
         });
 
         // Initialize Gemini
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+        const genAI = new GoogleGenerativeAI(apiKey);
         // Use configured model or default to gemini-1.5-flash which supports images well, 
         // user requested gemini-2.5-flash-image but we need to check availability. 
         // For now using the config value.
@@ -103,8 +112,10 @@ Devuelve ÚNICAMENTE el JSON, sin explicaciones.`;
 
         const prompt = config?.iaPrompt ? config.iaPrompt.replace(/\{\{CATEGORIES\}\}/g, categoryNames).replace(/\{\{ACCOUNTS\}\}/g, accountNames) : defaultPrompt;
 
+        console.log("🤖 Analyzing with Gemini AI...");
         const result = await model.generateContent([prompt, ...inlineDataParts]);
         const responseText = result.response.text();
+        console.log("✅ AI Analysis completed");
 
         // Cleanup JSON
         const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
@@ -114,8 +125,36 @@ Devuelve ÚNICAMENTE el JSON, sin explicaciones.`;
 
         return NextResponse.json(data);
 
-    } catch (error) {
-        console.error("AI Analysis Error:", error);
-        return NextResponse.json({ error: "Failed to analyze image" }, { status: 500 });
+    } catch (error: any) {
+        console.error("❌ AI Analysis Error:", error);
+        console.error("Error details:", {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+
+        // Provide more specific error messages
+        if (error.message?.includes("API key")) {
+            return NextResponse.json({
+                error: "Invalid Gemini API key. Please check your configuration."
+            }, { status: 500 });
+        }
+
+        if (error.message?.includes("quota")) {
+            return NextResponse.json({
+                error: "API quota exceeded. Please try again later."
+            }, { status: 429 });
+        }
+
+        if (error instanceof SyntaxError) {
+            return NextResponse.json({
+                error: "Failed to parse AI response. Please try again."
+            }, { status: 500 });
+        }
+
+        return NextResponse.json({
+            error: "Failed to analyze image. Please try again.",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        }, { status: 500 });
     }
 }
