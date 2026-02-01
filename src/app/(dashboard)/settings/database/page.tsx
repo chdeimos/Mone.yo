@@ -46,6 +46,10 @@ export default function DatabaseSettingsPage() {
     const [isRestoringUploads, setIsRestoringUploads] = useState(false);
     const [restoreUploadsFile, setRestoreUploadsFile] = useState<File | null>(null);
 
+    // Confirmation Dialogs State
+    const [isRestoreDbDialogOpen, setIsRestoreDbDialogOpen] = useState(false);
+    const [isRestoreUploadsDialogOpen, setIsRestoreUploadsDialogOpen] = useState(false);
+
     const handleBackup = async () => {
         setIsBackingUp(true);
         try {
@@ -73,34 +77,46 @@ export default function DatabaseSettingsPage() {
     };
 
     const handleRestore = async () => {
+        console.log("handleRestore called");
         if (!restoreFile) {
+            console.log("No restore file selected");
             alert("Por favor, selecciona un archivo de respaldo");
             return;
         }
 
-        if (!confirm("ADVERTENCIA: Esto reemplazará TODOS los datos actuales. ¿Estás seguro?")) {
-            return;
-        }
+        const confirmMsg = "ADVERTENCIA: Esto reemplazará TODOS los datos actuales. ¿Estás seguro?";
+        // confirm() removed, handled by Dialog
 
+        console.log("Starting restore process...");
+        setIsRestoring(true);
+        // Close dialog if open
+        setIsRestoreDbDialogOpen(false);
+
+        console.log("Starting restore process...");
         setIsRestoring(true);
         try {
             const formData = new FormData();
             formData.append("file", restoreFile);
 
+            console.log("Sending restore request...", restoreFile.name);
             const response = await fetch("/api/admin/database/restore", {
                 method: "POST",
                 body: formData
             });
 
+            console.log("Restore response status:", response.status);
+
             if (!response.ok) {
                 const error = await response.json();
+                console.error("Restore failed:", error);
                 throw new Error(error.message || "Error al restaurar base de datos");
             }
 
+            console.log("Restore successful");
             alert("Base de datos restaurada correctamente. Recargando página...");
             setTimeout(() => window.location.reload(), 2000);
         } catch (error: any) {
-            console.error(error);
+            console.error("Restore error catch:", error);
             alert(error.message || "Error al restaurar base de datos");
         } finally {
             setIsRestoring(false);
@@ -112,12 +128,8 @@ export default function DatabaseSettingsPage() {
             alert("Por favor, selecciona un archivo de respaldo");
             return;
         }
-
-        if (!confirm("ADVERTENCIA: Esto reemplazará TODOS los datos actuales. ¿Estás seguro?")) {
-            return;
-        }
-
-        handleRestore();
+        // Open confirmation dialog instead of window.confirm
+        setIsRestoreDbDialogOpen(true);
     };
 
     const handleBackupUploads = async () => {
@@ -152,9 +164,11 @@ export default function DatabaseSettingsPage() {
             return;
         }
 
-        if (!confirm("ADVERTENCIA: Esto reemplazará TODOS los archivos actuales en la carpeta de uploads. ¿Estás seguro?")) {
-            return;
-        }
+        // confirm() removed, handled by Dialog
+
+        setIsRestoringUploads(true);
+        // Close dialog if open
+        setIsRestoreUploadsDialogOpen(false);
 
         setIsRestoringUploads(true);
         try {
@@ -179,6 +193,14 @@ export default function DatabaseSettingsPage() {
         } finally {
             setIsRestoringUploads(false);
         }
+    };
+
+    const handleRestoreUploadsClick = () => {
+        if (!restoreUploadsFile) {
+            alert("Por favor, selecciona un archivo ZIP");
+            return;
+        }
+        setIsRestoreUploadsDialogOpen(true);
     };
 
     const handleSystemReset = async () => {
@@ -289,9 +311,18 @@ export default function DatabaseSettingsPage() {
                             <Input
                                 type="file"
                                 accept=".json"
-                                onChange={(e) => setRestoreFile(e.target.files?.[0] || null)}
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] || null;
+                                    setRestoreFile(file);
+                                }}
                                 className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs"
                             />
+                            {restoreFile && (
+                                <p className="text-xs text-emerald-500 font-bold flex items-center gap-2">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Archivo listo: {restoreFile.name}
+                                </p>
+                            )}
                         </div>
 
                         <Button
@@ -369,7 +400,7 @@ export default function DatabaseSettingsPage() {
                                 />
                             </div>
                             <Button
-                                onClick={handleRestoreUploads}
+                                onClick={handleRestoreUploadsClick}
                                 disabled={isRestoringUploads || !restoreUploadsFile}
                                 className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-12 gap-2"
                             >
@@ -488,6 +519,96 @@ export default function DatabaseSettingsPage() {
                                 {isReseting ? <Loader2 className="w-4 h-4 animate-spin" /> : "BORRAR TODO"}
                             </Button>
                         )}
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Restore DB Confirmation Dialog */}
+            <Dialog open={isRestoreDbDialogOpen} onOpenChange={setIsRestoreDbDialogOpen}>
+                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
+                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark bg-rose-500/5">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-rose-500/10 rounded-md flex items-center justify-center text-rose-500">
+                                <AlertTriangle className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Confirmar Restauración
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none">
+                                    Esta acción reemplazará los datos.
+                                </DialogDescription>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                    <div className="p-8 space-y-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                            Estás a punto de restaurar la base de datos desde el archivo <span className="font-bold text-black dark:text-white">{restoreFile?.name}</span>.
+                        </p>
+                        <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-md text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-tight flex gap-3">
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                            <span>Se eliminarán todos los datos actuales y serán reemplazados por los del respaldo.</span>
+                        </div>
+                    </div>
+                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 flex gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsRestoreDbDialogOpen(false)}
+                            className="flex-1 h-12 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleRestore}
+                            className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px]"
+                        >
+                            Confirmar y Restaurar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Restore Uploads Confirmation Dialog */}
+            <Dialog open={isRestoreUploadsDialogOpen} onOpenChange={setIsRestoreUploadsDialogOpen}>
+                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
+                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark bg-orange-500/5">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-orange-500/10 rounded-md flex items-center justify-center text-orange-500">
+                                <FolderSync className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Restaurar Archivos
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] font-black uppercase text-orange-500 tracking-widest leading-none">
+                                    Reemplazo de archivos multimedia
+                                </DialogDescription>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                    <div className="p-8 space-y-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                            Estás a punto de restaurar la carpeta de uploads desde <span className="font-bold text-black dark:text-white">{restoreUploadsFile?.name}</span>.
+                        </p>
+                        <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-md text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-tight flex gap-3">
+                            <AlertTriangle className="w-5 h-5 shrink-0" />
+                            <span>Se eliminarán todos los archivos actuales en /public/uploads/ antes de la restauración.</span>
+                        </div>
+                    </div>
+                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 flex gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsRestoreUploadsDialogOpen(false)}
+                            className="flex-1 h-12 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleRestoreUploads}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px]"
+                        >
+                            Confirmar y Restaurar
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

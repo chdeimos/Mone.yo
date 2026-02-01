@@ -27,6 +27,7 @@ export async function POST(req: Request) {
             await tx.transactionImage.deleteMany();
             await tx.transaction.deleteMany();
             await tx.budget.deleteMany();
+            await tx.subscription.deleteMany(); // Delete subscriptions
             await tx.account.deleteMany();
             await tx.accountType.deleteMany();
             await tx.category.deleteMany();
@@ -48,6 +49,9 @@ export async function POST(req: Request) {
 
             // Accounts depend on AccountType
             if (data.accounts?.length) await tx.account.createMany({ data: data.accounts });
+
+            // Subscriptions depend on Accounts, Categories
+            if (data.subscriptions?.length) await tx.subscription.createMany({ data: data.subscriptions });
 
             // Transactions depend on Accounts, Categories, Frequencies
             if (data.transactions?.length) await tx.transaction.createMany({ data: data.transactions });
