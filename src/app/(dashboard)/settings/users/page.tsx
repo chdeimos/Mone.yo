@@ -366,181 +366,186 @@ export default function UsersPage() {
             </Card>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
-                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark">
+                <DialogContent className="w-[95vw] sm:max-w-lg p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-2xl flex flex-col max-h-[95vh]">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center text-primary">
-                                <Users className="w-6 h-6" />
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Users className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
                                     {selectedUser ? "Perfil Operador" : "Nuevo Recluta"}
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">
-                                    Control de credenciales y facultades.
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    CONTROL DE CREDENCIALES Y FACULTADES.
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
-                    {error && (
-                        <div className="mx-8 mt-6 p-4 bg-rose-500/10 text-rose-500 rounded-md flex items-center gap-3 text-[10px] border border-rose-500/20 font-black uppercase tracking-widest animate-in fade-in slide-in-from-top-2">
-                            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
-                        </div>
-                    )}
-
-                    <form id="user-form" onSubmit={handleSubmit} className="p-8 space-y-5">
-                        <div className="space-y-2">
-                            <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Firma del Usuario</Label>
-                            <div className="relative group">
-                                <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    placeholder="Nombre completo..."
-                                    className="pl-10 h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-xs text-black dark:text-white focus:ring-1 focus:ring-primary"
-                                    required
-                                />
+                    <div className="flex-1 overflow-y-auto p-5 md:p-8 custom-scrollbar">
+                        {error && (
+                            <div className="mb-6 p-4 bg-rose-500/10 text-rose-500 rounded-xl flex items-center gap-3 text-[10px] border border-rose-500/20 font-black uppercase tracking-widest animate-in fade-in slide-in-from-top-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" /> {error}
                             </div>
-                        </div>
+                        )}
 
-                        <div className="space-y-2">
-                            <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Correo Electrónico</Label>
-                            <div className="relative group">
-                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="correo@dominio.com"
-                                    className="pl-10 h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-xs text-black dark:text-white focus:ring-1 focus:ring-primary"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">
-                                {selectedUser ? "Nueva Clave (Ignorar si no cambia)" : "Salvoconducto (Clave)"}
-                            </Label>
-                            <div className="relative group">
-                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    placeholder="••••••••"
-                                    className="pl-10 h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-xs text-black dark:text-white focus:ring-1 focus:ring-primary"
-                                    required={!selectedUser}
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="role" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Autoridad</Label>
-                                <Select
-                                    value={formData.role}
-                                    onValueChange={(val: any) => setFormData({ ...formData, role: val })}
-                                >
-                                    <SelectTrigger className="h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-xs text-black dark:text-white focus:ring-1 focus:ring-primary">
-                                        <SelectValue placeholder="Rol" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md shadow-2xl p-1.5">
-                                        <SelectItem value="USER" className="font-bold text-[11px] uppercase tracking-tight py-2.5 px-3 focus:bg-slate-50 dark:focus:bg-meta-4 cursor-pointer">
-                                            Operador Estándar
-                                        </SelectItem>
-                                        <SelectItem value="ADMIN" className="font-bold text-[11px] uppercase tracking-tight py-2.5 px-3 focus:bg-slate-50 dark:focus:bg-meta-4 text-primary cursor-pointer">
-                                            Administrador Total
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Blindaje 2FA</Label>
-                                <div className="h-11 flex items-center justify-between px-4 bg-slate-50 dark:bg-meta-4 border border-stroke dark:border-strokedark rounded-md">
-                                    <div className="flex items-center gap-2">
-                                        <ShieldCheck className={cn("w-4 h-4 transition-colors", formData.twoFactorEnabled ? "text-emerald-500" : "text-slate-300 dark:text-slate-500")} />
-                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Activo</span>
-                                    </div>
-                                    <Switch
-                                        checked={formData.twoFactorEnabled}
-                                        onCheckedChange={(checked) => setFormData({ ...formData, twoFactorEnabled: checked })}
-                                        className="data-[state=checked]:bg-primary scale-90"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {formData.role === "USER" && (
-                            <div className="space-y-4 pt-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Permisos de Acceso</Label>
-                                <div className="grid grid-cols-1 gap-2 bg-slate-50 dark:bg-meta-4/20 p-4 rounded-md border border-stroke dark:border-strokedark">
-                                    {[
-                                        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-                                        { id: 'vision', label: 'IA Vision', icon: Sparkles },
-                                        { id: 'transactions', label: 'Movimientos', icon: ArrowLeftRight },
-                                        { id: 'budgets', label: 'Presupuestos', icon: PieChart },
-                                        { id: 'accounts', label: 'Mis Cuentas', icon: Wallet },
-                                        { id: 'reports', label: 'Reportes', icon: TrendingUp },
-                                    ].map((perm) => (
-                                        <div key={perm.id} className="flex items-center justify-between py-1">
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn(
-                                                    "w-8 h-8 rounded-md flex items-center justify-center transition-colors",
-                                                    (formData.permissions as any)[perm.id] ? "bg-primary/10 text-primary" : "bg-slate-100 dark:bg-meta-4 text-slate-400"
-                                                )}>
-                                                    <perm.icon className="w-4 h-4" />
-                                                </div>
-                                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">{perm.label}</span>
-                                            </div>
-                                            <Switch
-                                                checked={(formData.permissions as any)[perm.id]}
-                                                onCheckedChange={(checked) => setFormData({
-                                                    ...formData,
-                                                    permissions: { ...formData.permissions, [perm.id]: checked }
-                                                })}
-                                                className="data-[state=checked]:bg-primary scale-75"
-                                            />
-                                        </div>
-                                    ))}
-
-                                    <div className="flex items-center justify-between py-1 border-t border-stroke dark:border-strokedark mt-2 pt-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn(
-                                                "w-8 h-8 rounded-md flex items-center justify-center transition-colors",
-                                                formData.permissions.settings ? "bg-rose-500/10 text-rose-500" : "bg-slate-100 dark:bg-meta-4 text-slate-400"
-                                            )}>
-                                                <Settings className="w-4 h-4" />
-                                            </div>
-                                            <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">Configuración</span>
-                                        </div>
-                                        <Switch
-                                            checked={formData.permissions.settings}
-                                            onCheckedChange={(checked) => setFormData({
-                                                ...formData,
-                                                permissions: { ...formData.permissions, settings: checked }
-                                            })}
-                                            className="data-[state=checked]:bg-rose-500 scale-75"
+                        <form id="user-form" onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Firma del Usuario</Label>
+                                    <div className="relative group">
+                                        <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                                        <Input
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="Nombre completo..."
+                                            className="pl-12 h-12 rounded-xl bg-slate-50 dark:bg-meta-4/20 border-none font-bold text-black dark:text-white text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                                            required
                                         />
                                     </div>
                                 </div>
-                                <p className="text-[9px] text-slate-400 font-medium italic mt-1 leading-tight px-1">
-                                    Los Administradores siempre tienen acceso total a todas las secciones.
-                                </p>
-                            </div>
-                        )}
-                    </form>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/10 flex-col sm:flex-row gap-3">
+                                <div className="space-y-2">
+                                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Correo Electrónico</Label>
+                                    <div className="relative group">
+                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                                        <Input
+                                            id="email"
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            placeholder="correo@dominio.com"
+                                            className="pl-12 h-12 rounded-xl bg-slate-50 dark:bg-meta-4/20 border-none font-bold text-black dark:text-white text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">
+                                        {selectedUser ? "Nueva Clave (Opcional)" : "Salvoconducto (Clave)"}
+                                    </Label>
+                                    <div className="relative group">
+                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            value={formData.password}
+                                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                            placeholder="••••••••"
+                                            className="pl-12 h-12 rounded-xl bg-slate-50 dark:bg-meta-4/20 border-none font-bold text-black dark:text-white text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                                            required={!selectedUser}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <Label htmlFor="role" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Autoridad</Label>
+                                    <Select
+                                        value={formData.role}
+                                        onValueChange={(val: any) => setFormData({ ...formData, role: val })}
+                                    >
+                                        <SelectTrigger className="h-12 rounded-xl bg-slate-50 dark:bg-meta-4/20 border-none font-bold text-black dark:text-white text-xs focus:ring-2 focus:ring-primary/20 transition-all shadow-sm">
+                                            <SelectValue placeholder="Rol" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl p-2 z-[60]">
+                                            <SelectItem value="USER" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
+                                                Operador Estándar
+                                            </SelectItem>
+                                            <SelectItem value="ADMIN" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 text-primary cursor-pointer rounded-lg">
+                                                Administrador Total
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Blindaje 2FA</Label>
+                                    <div className="h-12 flex items-center justify-between px-4 bg-slate-50 dark:bg-meta-4/20 rounded-xl shadow-sm">
+                                        <div className="flex items-center gap-2">
+                                            <ShieldCheck className={cn("w-4 h-4 transition-colors", formData.twoFactorEnabled ? "text-emerald-500" : "text-slate-300 dark:text-slate-500")} />
+                                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Activo</span>
+                                        </div>
+                                        <Switch
+                                            checked={formData.twoFactorEnabled}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, twoFactorEnabled: checked })}
+                                            className="data-[state=checked]:bg-primary"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {formData.role === "USER" && (
+                                <div className="space-y-4 pt-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-primary ml-1">Facultades de Acceso</Label>
+                                    <div className="grid grid-cols-1 gap-2 bg-slate-50 dark:bg-meta-4/10 p-4 rounded-xl border border-dashed border-stroke dark:border-strokedark">
+                                        {[
+                                            { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                                            { id: 'vision', label: 'IA Vision', icon: Sparkles },
+                                            { id: 'transactions', label: 'Movimientos', icon: ArrowLeftRight },
+                                            { id: 'budgets', label: 'Presupuestos', icon: PieChart },
+                                            { id: 'accounts', label: 'Mis Cuentas', icon: Wallet },
+                                            { id: 'reports', label: 'Reportes', icon: TrendingUp },
+                                        ].map((perm) => (
+                                            <div key={perm.id} className="flex items-center justify-between py-1 px-1">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={cn(
+                                                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                                                        (formData.permissions as any)[perm.id] ? "bg-primary/10 text-primary shadow-sm" : "bg-white dark:bg-meta-4 text-slate-400"
+                                                    )}>
+                                                        <perm.icon className="w-4 h-4" />
+                                                    </div>
+                                                    <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">{perm.label}</span>
+                                                </div>
+                                                <Switch
+                                                    checked={(formData.permissions as any)[perm.id]}
+                                                    onCheckedChange={(checked) => setFormData({
+                                                        ...formData,
+                                                        permissions: { ...formData.permissions, [perm.id]: checked }
+                                                    })}
+                                                    className="data-[state=checked]:bg-primary scale-75"
+                                                />
+                                            </div>
+                                        ))}
+
+                                        <div className="flex items-center justify-between py-2 border-t border-stroke dark:border-strokedark mt-2 pt-3 px-1">
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn(
+                                                    "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                                                    formData.permissions.settings ? "bg-rose-500/10 text-rose-500 shadow-sm" : "bg-white dark:bg-meta-4 text-slate-400"
+                                                )}>
+                                                    <Settings className="w-4 h-4" />
+                                                </div>
+                                                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-tight">Configuración</span>
+                                            </div>
+                                            <Switch
+                                                checked={formData.permissions.settings}
+                                                onCheckedChange={(checked) => setFormData({
+                                                    ...formData,
+                                                    permissions: { ...formData.permissions, settings: checked }
+                                                })}
+                                                className="data-[state=checked]:bg-rose-500 scale-75"
+                                            />
+                                        </div>
+                                    </div>
+                                    <p className="text-[9px] text-slate-400 font-bold italic mt-1 leading-tight px-1 uppercase tracking-tighter">
+                                        Administradores poseen autoridad total sobre todos los sectores.
+                                    </p>
+                                </div>
+                            )}
+                        </form>
+                    </div>
+
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 shrink-0 border-t border-stroke dark:border-strokedark">
                         <Button
                             type="button"
                             variant="ghost"
                             onClick={() => setIsDialogOpen(false)}
-                            className="h-11 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
                         >
                             Ignorar
                         </Button>
@@ -548,30 +553,30 @@ export default function UsersPage() {
                             form="user-form"
                             type="submit"
                             disabled={submitting}
-                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md font-black uppercase tracking-widest px-8 shadow-md h-11 text-[10px] border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-widest px-8 shadow-lg h-12 text-[10px] border-none active:scale-[0.98] transition-all"
                         >
-                            {submitting ? "Procesando..." : "Confirmar"}
+                            {submitting ? "..." : "Confirmar"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
             <AlertDialog open={isDeleteDialogOpen} onOpenChange={setOpenDeleteDialog}>
-                <AlertDialogContent className="p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md sm:max-w-md">
-                    <div className="p-8 text-center">
-                        <div className="w-16 h-16 bg-rose-500/10 rounded-md flex items-center justify-center mx-auto mb-5 text-rose-500">
+                <AlertDialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <div className="p-8 text-center bg-white dark:bg-boxdark">
+                        <div className="w-16 h-16 bg-rose-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-rose-500 border border-rose-500/10 shadow-inner">
                             <AlertCircle className="w-8 h-8" />
                         </div>
-                        <h2 className="text-xl font-bold uppercase tracking-tight text-black dark:text-white mb-2">¿Eliminar Usuario?</h2>
-                        <p className="text-[11px] text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
-                            Estás a punto de revocar permanentemente el acceso a <span className="font-black text-black dark:text-white underline decoration-rose-500/30 decoration-2">{selectedUser?.name}</span>.
+                        <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-black dark:text-white mb-3">¿Revocar <span className="text-rose-500 italic">Acceso</span>?</h2>
+                        <p className="text-[10px] md:text-xs text-slate-500 font-bold leading-relaxed uppercase tracking-[0.1em] max-w-[280px] mx-auto opacity-80">
+                            Estás a punto de eliminar permanentemente a <span className="font-black text-black dark:text-white underline decoration-rose-500/30 decoration-2">{selectedUser?.name}</span> del sistema operativo.
                         </p>
                     </div>
-                    <AlertDialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/10 flex gap-3">
-                        <AlertDialogCancel className="h-11 flex-1 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-black dark:hover:text-white border-stroke dark:border-strokedark bg-white dark:bg-boxdark m-0">
+                    <AlertDialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 border-t border-stroke dark:border-strokedark shrink-0">
+                        <AlertDialogCancel className="h-12 flex-1 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-black dark:hover:text-white border-none bg-transparent m-0 transition-all">
                             No, Retened
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="h-11 flex-1 bg-rose-500 hover:bg-opacity-90 text-white rounded-md font-black uppercase text-[10px] tracking-widest border-none m-0 shadow-md">
+                        <AlertDialogAction onClick={handleDelete} className="h-12 flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest border-none m-0 shadow-lg shadow-rose-600/30 active:scale-[0.98] transition-all">
                             Sí, Expulsar
                         </AlertDialogAction>
                     </AlertDialogFooter>

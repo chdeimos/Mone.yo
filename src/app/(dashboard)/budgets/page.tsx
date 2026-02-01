@@ -114,24 +114,25 @@ const BudgetCard = ({ budget, onEdit, onDelete }: { budget: any, onEdit: (b: any
                         <MoreVertical className="w-4 h-4" />
                     </Button>
 
-                    <DialogContent className="w-screen max-w-none m-0 rounded-t-[20px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.2)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200] data-[state=closed]:slide-out-to-bottom data-[state=closed]:translate-y-0">
-                        <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-2" />
+                    <DialogContent className="w-[98vw] max-w-none m-0 rounded-t-[32px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.3)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200]">
+                        <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2 opacity-50" />
 
-                        <DialogHeader className="px-6 pb-2 text-left">
-                            <DialogTitle className="text-lg font-black uppercase text-slate-800 dark:text-white tracking-tight">Opciones</DialogTitle>
-                            <DialogDescription className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                                Presupuesto {budget.category.name}
+                        <DialogHeader className="px-8 pb-4 text-left">
+                            <DialogTitle className="text-2xl font-black uppercase text-slate-800 dark:text-white tracking-tighter">Opciones de <span className="text-primary italic">Presupuesto</span></DialogTitle>
+                            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-70">
+                                GESTIÓN DE {budget.category.name}
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div className="flex flex-col p-4 gap-2 pb-8 overflow-y-auto flex-1 min-h-0">
-                            <Button onClick={() => { setIsMobileMenuOpen(false); onEdit(budget); }} variant="outline" className="h-14 justify-start px-6 rounded-2xl gap-4 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-meta-4/30 hover:bg-slate-100 dark:hover:bg-meta-4/50 text-slate-700 dark:text-white font-bold uppercase tracking-widest text-xs shadow-sm">
-                                <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><Pencil className="w-4 h-4" /></div> Editar Límite
+                        <div className="flex flex-col p-6 gap-3 pb-12 overflow-y-auto flex-1 min-h-0">
+                            <Button onClick={() => { setIsMobileMenuOpen(false); onEdit(budget); }} variant="outline" className="h-16 justify-start px-6 rounded-2xl gap-5 border-none bg-slate-50 dark:bg-meta-4/20 hover:bg-slate-100 dark:hover:bg-meta-4/40 text-slate-700 dark:text-white font-black uppercase tracking-widest text-xs shadow-sm transition-all active:scale-[0.98]">
+                                <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm text-primary"><Pencil className="w-5 h-5" /></div>
+                                <span>Editar Límite</span>
                             </Button>
 
-                            <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                            <div className="h-px bg-slate-100 dark:bg-slate-800/50 my-2" />
 
-                            <Button onClick={() => { setIsMobileMenuOpen(false); onDelete(budget.id); }} variant="ghost" className="h-12 justify-center gap-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-black uppercase tracking-widest text-[10px]">
+                            <Button onClick={() => { setIsMobileMenuOpen(false); onDelete(budget.id); }} variant="ghost" className="h-14 justify-center gap-2 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-all">
                                 <Trash2 className="w-4 h-4" /> Eliminar Presupuesto
                             </Button>
                         </div>
@@ -447,38 +448,39 @@ export default function BudgetsPage() {
 
             {/* Modal Crear/Editar */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark rounded-md border-none shadow-2xl p-0 overflow-hidden max-h-[90vh] flex flex-col">
-                    <DialogHeader className="p-8 bg-boxdark text-white shrink-0">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/10 rounded-lg text-[#3c50e0]">
-                                <Plus className="w-5 h-5" />
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark rounded-2xl border-none shadow-2xl p-0 overflow-hidden max-h-[95vh] flex flex-col">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Wallet className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-white uppercase tracking-tight leading-none mb-1.5">
-                                    {editingId ? "Ajustar Límite" : "Configurar Presupuesto"}
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    {editingId ? "Ajustar" : "Nuevo"} <span className="text-primary italic">Límite</span>
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">
-                                    Vigencia: <span className="text-[#3c50e0] font-black">{MONTHS[currentMonth - 1]} {currentYear}</span>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    Vigencia: <span className="text-primary font-black">{MONTHS[currentMonth - 1]} {currentYear}</span>
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6 overflow-y-auto flex-1">
+                    <div className="p-6 md:p-8 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
                         {!editingId && (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Categoría Objetivo</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Categoría Objetivo</Label>
                                 <Select value={selectedCategoryId} onValueChange={setSelectedCategoryId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue placeholder="Seleccionar sector...">
                                             {categories.find(c => c.id === selectedCategoryId)?.name}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {categories.map((cat) => (
-                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                                                     {cat.name}
                                                 </div>
                                             </SelectItem>
@@ -489,32 +491,34 @@ export default function BudgetsPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400">Tope Máximo</Label>
-                            <div className="relative">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Tope Máximo</Label>
+                            <div className="relative group">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 bg-primary/10 rounded-md text-primary font-black text-xs">€</div>
                                 <Input
                                     type="number"
                                     value={limit}
                                     onChange={(e) => setLimit(e.target.value)}
                                     placeholder="0.00"
-                                    className="h-11 bg-primary/5 border-none rounded-md font-black text-lg text-primary text-center pl-10"
+                                    className="h-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-black text-xl text-primary text-center pl-14 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
                                 />
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-black">€</span>
                             </div>
                         </div>
 
-                        <div className="space-y-4 p-4 bg-slate-50 dark:bg-meta-4/20 rounded-lg border border-stroke/50 dark:border-strokedark/50">
-                            <div className="flex flex-col gap-1">
-                                <Label className="text-[10px] font-black uppercase text-black dark:text-white tracking-widest">Replicar en otros meses</Label>
-                                <p className="text-[9px] text-slate-400 font-medium uppercase tracking-tight">Selecciona los meses para clonar este presupuesto. Si seleccionas uno anterior al actual, se aplicará al año siguiente.</p>
+                        <div className="space-y-4 p-5 bg-slate-50 dark:bg-meta-4/20 rounded-2xl border border-dashed border-stroke dark:border-strokedark/50">
+                            <div className="flex flex-col gap-1.5 px-1">
+                                <Label className="text-[10px] font-black uppercase text-black dark:text-white tracking-widest leading-none">Replicar en otros periodos</Label>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight opacity-70">
+                                    SELECCIONA PARA CLONAR ESTE LÍMITE AUTOMÁTICAMENTE.
+                                </p>
                             </div>
 
-                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                            <div className="grid grid-cols-3 gap-2">
                                 {MONTHS.map((monthName, index) => {
                                     const monthNum = index + 1;
                                     const isSelected = selectedCloneMonths.includes(monthNum);
                                     const isCurrent = monthNum === currentMonth;
 
-                                    if (isCurrent) return null; // No clonar al mismo mes actual
+                                    if (isCurrent) return null;
 
                                     return (
                                         <button
@@ -528,10 +532,10 @@ export default function BudgetsPage() {
                                                 );
                                             }}
                                             className={cn(
-                                                "px-2 py-2 rounded text-[9px] font-black uppercase tracking-tighter transition-all border",
+                                                "h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm",
                                                 isSelected
-                                                    ? "bg-[#3c50e0] border-[#3c50e0] text-white shadow-sm"
-                                                    : "bg-white dark:bg-boxdark border-stroke dark:border-strokedark text-slate-500 hover:border-[#3c50e0]/50"
+                                                    ? "bg-blue-600 border-blue-600 text-white"
+                                                    : "bg-white dark:bg-boxdark border-stroke dark:border-strokedark text-slate-500 hover:border-primary/50"
                                             )}
                                         >
                                             {monthName.substring(0, 3)}
@@ -542,18 +546,18 @@ export default function BudgetsPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-4 bg-slate-50 dark:bg-meta-4/10 flex-row justify-end gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
                         <Button
                             variant="ghost"
                             onClick={() => setIsModalOpen(false)}
-                            className="h-11 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors px-6"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
                         >
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleSave}
                             disabled={!selectedCategoryId || !limit}
-                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md font-black uppercase tracking-widest h-11 text-[10px] cursor-pointer transition-colors px-10 shadow-md disabled:pointer-events-auto disabled:cursor-not-allowed border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
                         >
                             {editingId ? "Actualizar" : "Confirmar"}
                         </Button>

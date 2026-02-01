@@ -163,62 +163,65 @@ export default function FrequenciesPage() {
             </div>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
-                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center text-primary">
-                                <Clock className="w-6 h-6" />
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Clock className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
-                                    {editingFrequency ? "Ajustar Ciclo" : "Registrar Lapso"}
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    {editingFrequency ? "Ajustar" : "Registrar"} <span className="text-primary italic">Ciclo</span>
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">
-                                    Define la repetición para tus eventos financieros.
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    DEFINE LA REPETICIÓN PARA TUS EVENTOS FINANCIEROS.
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Alias del Período</Label>
-                            <Input
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Ej: Pago Mensual, Trimestral..."
-                                className="h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-black dark:text-white text-xs focus:ring-1 focus:ring-primary"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Magnitud (Días)</Label>
-                            <div className="relative">
+                    <div className="p-5 md:p-8 space-y-6 bg-white dark:bg-boxdark overflow-y-auto custom-scrollbar flex-1">
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Alias del Período</Label>
                                 <Input
-                                    type="number"
-                                    value={days}
-                                    onChange={(e) => setDays(e.target.value)}
-                                    placeholder="Ej: 30, 365..."
-                                    min="1"
-                                    className="h-11 rounded-md bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark font-bold text-black dark:text-white text-xs focus:ring-1 focus:ring-primary pl-10"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Ej: Pago Mensual, Trimestral..."
+                                    className="h-12 rounded-xl bg-slate-50 dark:bg-meta-4 border-none font-bold text-black dark:text-white text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
                                 />
-                                <CalendarDays className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase tracking-widest pointer-events-none">Naturales</span>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Magnitud (Días)</Label>
+                                <div className="relative group">
+                                    <Input
+                                        type="number"
+                                        value={days}
+                                        onChange={(e) => setDays(e.target.value)}
+                                        placeholder="Ej: 30, 365..."
+                                        min="1"
+                                        className="h-12 rounded-xl bg-slate-50 dark:bg-meta-4 border-none font-bold text-black dark:text-white text-sm focus:ring-2 focus:ring-primary/20 transition-all shadow-sm pl-12"
+                                    />
+                                    <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-300 uppercase tracking-widest pointer-events-none opacity-50">Días Naturales</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/10 flex-col sm:flex-row gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 shrink-0 border-t border-stroke dark:border-strokedark">
                         <Button
                             variant="ghost"
                             onClick={() => setIsModalOpen(false)}
-                            className="h-11 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
                         >
                             Ignorar
                         </Button>
                         <Button
                             onClick={handleSave}
                             disabled={!name || !days}
-                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md font-black uppercase tracking-widest px-8 shadow-md h-11 text-[10px] border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase tracking-widest px-8 shadow-lg h-12 text-[10px] border-none active:scale-[0.98] transition-all"
                         >
                             {editingFrequency ? "Actualizar" : "Confirmar"}
                         </Button>

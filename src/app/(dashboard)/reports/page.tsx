@@ -372,7 +372,7 @@ export default function ReportsPage() {
                     <Button
                         onClick={handlePrint}
                         variant="outline"
-                        className="h-11 px-6 rounded-md gap-2 font-bold text-slate-600 dark:text-white border-stroke dark:border-strokedark hover:text-primary transition-all shadow-sm bg-white dark:bg-boxdark"
+                        className="h-[44px] md:h-11 px-6 rounded-md gap-2 font-bold text-slate-600 dark:text-white border-stroke dark:border-strokedark hover:text-primary transition-all shadow-sm bg-white dark:bg-boxdark"
                     >
                         <Printer className="w-4 h-4" />
                         <span className="hidden sm:inline uppercase tracking-widest text-[10px]">Imprimir PDF</span>
@@ -381,13 +381,13 @@ export default function ReportsPage() {
             </div>
 
             {/* Filter Bar */}
-            <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-6 print:hidden">
-                <div className="flex flex-col gap-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <Card className="bg-white dark:bg-boxdark border-none shadow-sm p-4 sm:p-8 no-print">
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Cuenta</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Cuenta/Entidad</Label>
                             <Select value={filterAccountId} onValueChange={setFilterAccountId}>
-                                <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                <SelectTrigger className="h-[44px] md:h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs">
                                     <SelectValue placeholder="Todas">
                                         {filterAccountId === "all" ? "Todas las Cuentas" : accounts.find(a => a.id === filterAccountId)?.name}
                                     </SelectValue>
@@ -408,7 +408,7 @@ export default function ReportsPage() {
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Categoría</Label>
                             <Select value={filterCategoryId} onValueChange={setFilterCategoryId}>
-                                <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                <SelectTrigger className="h-[44px] md:h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs">
                                     <SelectValue placeholder="Todas">
                                         {filterCategoryId === "all" ? "Todas las Categorías" : categories.find(c => c.id === filterCategoryId)?.name}
                                     </SelectValue>
@@ -429,7 +429,7 @@ export default function ReportsPage() {
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Período Rápido</Label>
                             <Select value={filterDateRange} onValueChange={handleRangeChange}>
-                                <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                <SelectTrigger className="h-[44px] md:h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
@@ -443,13 +443,13 @@ export default function ReportsPage() {
                         </div>
                         <div className="space-y-2 lg:col-span-2">
                             <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Rango de Fechas</Label>
-                            <div className="flex flex-col sm:flex-row items-center gap-3">
+                            <div className="flex flex-col sm:flex-row items-center gap-2 md:gap-3">
                                 <div className="w-full">
                                     <Input
                                         type="date"
                                         value={startDate}
                                         onChange={(e) => { setStartDate(e.target.value); setFilterDateRange('custom'); }}
-                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs px-3 w-full"
+                                        className="h-[44px] md:h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs px-3 w-full"
                                     />
                                 </div>
                                 <div className="hidden sm:block text-slate-300 font-bold">/</div>
@@ -458,7 +458,7 @@ export default function ReportsPage() {
                                         type="date"
                                         value={endDate}
                                         onChange={(e) => { setEndDate(e.target.value); setFilterDateRange('custom'); }}
-                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs px-3 w-full"
+                                        className="h-[44px] md:h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold text-xs px-3 w-full"
                                     />
                                 </div>
                             </div>
@@ -468,7 +468,7 @@ export default function ReportsPage() {
                         <Button
                             variant="ghost"
                             onClick={resetFilters}
-                            className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md gap-2 font-bold text-xs uppercase tracking-widest"
+                            className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-md gap-2 font-bold text-[10px] sm:text-xs uppercase tracking-widest h-[44px] md:h-9"
                         >
                             <FilterX className="w-4 h-4" /> Limpiar Filtros
                         </Button>
@@ -487,8 +487,8 @@ export default function ReportsPage() {
                         <p className="text-xs text-slate-500 font-medium tracking-tight">Balance temporal de ingresos y gastos</p>
                     </div>
                 </div>
-                <div className="mt-4 overflow-x-auto custom-scrollbar pb-4">
-                    <div className="h-[350px] min-w-[800px] md:min-w-full">
+                <div className="mt-4 pb-4">
+                    <div className="h-[350px] w-full">
                         {loading ? (
                             <div className="h-full flex flex-col items-center justify-center space-y-4">
                                 <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
@@ -505,19 +505,22 @@ export default function ReportsPage() {
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-strokedark" />
                                     <XAxis
                                         dataKey="displayDate"
-                                        tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }}
+                                        tick={{ fontSize: isMobile ? 8 : 10, fontWeight: 600, fill: '#94a3b8' }}
                                         axisLine={false}
                                         tickLine={false}
-                                        tickMargin={10}
+                                        tickMargin={isMobile ? 5 : 10}
+                                        interval={isMobile ? "preserveStartEnd" : 0}
                                     />
+
                                     <YAxis
+                                        width={isMobile ? 65 : 100}
                                         tickFormatter={(value) => `€${Math.abs(value) >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
-                                        tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }}
+                                        tick={{ fontSize: isMobile ? 8 : 10, fontWeight: 600, fill: '#94a3b8' }}
                                         axisLine={false}
                                         tickLine={false}
                                     />
                                     <Tooltip
-                                        contentStyle={{ borderRadius: '8px', border: 'none', backgroundColor: '#1c2434', color: '#fff', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', backgroundColor: '#1c2434', color: '#fff', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: isMobile ? '8px' : '12px' }}
                                         itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
                                         labelStyle={{ color: '#94a3b8', marginBottom: '4px', fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase' }}
                                         formatter={(value: number) => [formatCurrency(value)]}
@@ -563,8 +566,8 @@ export default function ReportsPage() {
                         </h3>
                         <p className="text-xs text-slate-500 font-medium tracking-tight">Desglose volumétrico de egresos</p>
                     </div>
-                    <div className="mt-4 overflow-x-auto custom-scrollbar pb-4">
-                        <div className="h-[350px] min-w-[800px] md:min-w-full">
+                    <div className="mt-4 pb-4">
+                        <div className="h-[350px] w-full">
                             {loading ? (
                                 <div className="h-full flex items-center justify-center">
                                     <div className="w-8 h-8 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
@@ -580,20 +583,23 @@ export default function ReportsPage() {
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-strokedark" />
                                         <XAxis
                                             dataKey="name"
-                                            tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }}
+                                            tick={{ fontSize: isMobile ? 8 : 10, fontWeight: 600, fill: '#94a3b8' }}
                                             axisLine={false}
                                             tickLine={false}
-                                            tickMargin={10}
+                                            tickMargin={isMobile ? 5 : 10}
+                                            interval={isMobile ? "preserveStartEnd" : 0}
                                         />
+
                                         <YAxis
+                                            width={isMobile ? 65 : 100}
                                             tickFormatter={(value) => `€${Math.abs(value) >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
-                                            tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }}
+                                            tick={{ fontSize: isMobile ? 8 : 10, fontWeight: 600, fill: '#94a3b8' }}
                                             axisLine={false}
                                             tickLine={false}
                                         />
                                         <Tooltip
                                             cursor={{ fill: '#f1f5f9', opacity: 0.1 }}
-                                            contentStyle={{ borderRadius: '8px', border: 'none', backgroundColor: '#1c2434', color: '#fff', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+                                            contentStyle={{ borderRadius: '8px', border: 'none', backgroundColor: '#1c2434', color: '#fff', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: isMobile ? '8px' : '12px' }}
                                             itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
                                             labelStyle={{ color: '#94a3b8', marginBottom: '4px', fontSize: '10px', fontWeight: 'black', textTransform: 'uppercase' }}
                                             formatter={(value: number) => [formatCurrency(value), "Total"]}
@@ -680,7 +686,7 @@ export default function ReportsPage() {
                                         verticalAlign="bottom"
                                         align="center"
                                         iconType="circle"
-                                        wrapperStyle={{ paddingTop: '20px', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase' }}
+                                        wrapperStyle={{ paddingTop: '20px', fontSize: isMobile ? '8px' : '9px', fontWeight: 'bold', textTransform: 'uppercase' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
@@ -698,8 +704,8 @@ export default function ReportsPage() {
                     </h3>
                     <p className="text-xs text-slate-500 font-medium tracking-tight">Comparativa de ejecución presupuestaria</p>
                 </div>
-                <div className="mt-4 overflow-x-auto custom-scrollbar pb-4">
-                    <div className="h-[350px] min-w-[800px] md:min-w-full">
+                <div className="mt-4 pb-4">
+                    <div className="h-[350px] w-full">
                         {loading ? (
                             <div className="h-full flex items-center justify-center">
                                 <div className="w-8 h-8 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
@@ -716,16 +722,18 @@ export default function ReportsPage() {
                                     <XAxis
                                         dataKey="name"
                                         tick={<CustomBudgetTick data={budgetChartData} />}
-                                        interval={0}
+                                        interval={isMobile ? "preserveStartEnd" : 0}
                                         tickLine={false}
                                         axisLine={false}
                                     />
                                     <YAxis
+                                        width={isMobile ? 65 : 100}
                                         tickFormatter={(value) => `€${Math.abs(value) >= 1000 ? (value / 1000).toFixed(0) + 'k' : value}`}
-                                        tick={{ fontSize: 10, fontWeight: 600, fill: '#94a3b8' }}
+                                        tick={{ fontSize: isMobile ? 8 : 10, fontWeight: 600, fill: '#94a3b8' }}
                                         axisLine={false}
                                         tickLine={false}
                                     />
+
                                     <Tooltip
                                         cursor={{ fill: 'transparent' }}
                                         content={<CustomBudgetTooltip />}
@@ -857,7 +865,7 @@ export default function ReportsPage() {
 
                     {/* Mobile Card List (Only Render on Mobile) */}
                     {isMobile && (
-                        <div className="space-y-4 px-6 py-4">
+                        <div className="space-y-4 px-2 py-4">
                             {loading ? (
                                 <div className="py-12 flex flex-col items-center justify-center space-y-3">
                                     <div className="w-6 h-6 border-2 border-slate-100 border-t-primary rounded-full animate-spin" />
@@ -963,5 +971,3 @@ export default function ReportsPage() {
         </div>
     );
 }
-
-

@@ -121,25 +121,26 @@ const AccountCard = ({
                             <MoreVertical className="w-4 h-4" />
                         </Button>
 
-                        <DialogContent className="w-screen max-w-none m-0 rounded-t-[20px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.2)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200] data-[state=closed]:slide-out-to-bottom data-[state=closed]:translate-y-0">
-                            <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-2" />
+                        <DialogContent className="w-[98vw] max-w-none m-0 rounded-t-[32px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.3)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200]">
+                            <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2 opacity-50" />
 
-                            <DialogHeader className="px-6 pb-2 text-left">
-                                <DialogTitle className="text-lg font-black uppercase text-slate-800 dark:text-white tracking-tight">Opciones</DialogTitle>
-                                <DialogDescription className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                                    Cuenta {account.name}
+                            <DialogHeader className="px-8 pb-4 text-left">
+                                <DialogTitle className="text-2xl font-black uppercase text-slate-800 dark:text-white tracking-tighter">Opciones de <span className="text-primary italic">Cuenta</span></DialogTitle>
+                                <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-70">
+                                    GESTIÓN DE {account.name}
                                 </DialogDescription>
                             </DialogHeader>
 
-                            <div className="flex flex-col p-4 gap-2 pb-8 overflow-y-auto flex-1 min-h-0">
-                                <Button onClick={(e) => { setIsMobileMenuOpen(false); onEdit(account, e); }} variant="outline" className="h-14 justify-start px-6 rounded-2xl gap-4 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-meta-4/30 hover:bg-slate-100 dark:hover:bg-meta-4/50 text-slate-700 dark:text-white font-bold uppercase tracking-widest text-xs shadow-sm">
-                                    <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><Pencil className="w-4 h-4" /></div> Editar Cuenta
+                            <div className="flex flex-col p-6 gap-3 pb-12 overflow-y-auto flex-1 min-h-0">
+                                <Button onClick={(e) => { setIsMobileMenuOpen(false); onEdit(account, e); }} variant="outline" className="h-16 justify-start px-6 rounded-2xl gap-5 border-none bg-slate-50 dark:bg-meta-4/20 hover:bg-slate-100 dark:hover:bg-meta-4/40 text-slate-700 dark:text-white font-black uppercase tracking-widest text-xs shadow-sm transition-all active:scale-[0.98]">
+                                    <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm text-primary"><Pencil className="w-5 h-5" /></div>
+                                    <span>Editar Entidad</span>
                                 </Button>
 
-                                <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                                <div className="h-px bg-slate-100 dark:bg-slate-800/50 my-2" />
 
-                                <Button onClick={() => { setIsMobileMenuOpen(false); onDelete(account); }} variant="ghost" className="h-12 justify-center gap-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-black uppercase tracking-widest text-[10px]">
-                                    <Trash2 className="w-4 h-4" /> Eliminar Cuenta
+                                <Button onClick={() => { setIsMobileMenuOpen(false); onDelete(account); }} variant="ghost" className="h-14 justify-center gap-2 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-all">
+                                    <Trash2 className="w-4 h-4" /> Eliminar Definitivamente
                                 </Button>
                             </div>
                         </DialogContent>
@@ -642,48 +643,62 @@ export default function AccountsPage() {
 
             {/* Modal de Nueva Cuenta */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col">
-                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 sm:p-8 text-white space-y-1 shrink-0">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">
-                            {editingAccount ? "Editar" : "Nueva"}
-                        </DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs font-semibold uppercase tracking-widest italic opacity-70">
-                            Registro de Activo Financiero
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Building2 className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    {editingAccount ? "Editar" : "Nueva"} <span className="text-primary italic">Cuenta</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    REGISTRO DE ACTIVO FINANCIERO.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-6 sm:p-8 space-y-6">
+                    <div className="p-6 md:p-8 space-y-6">
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nombre del Activo</Label>
-                            <Input
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Ej: Cuenta Nómina BBVA..."
-                                className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Saldo Inicial</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nombre del Activo</Label>
+                            <div className="relative group">
+                                <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
                                 <Input
-                                    type="number"
-                                    value={balance}
-                                    onChange={(e) => setBalance(e.target.value)}
-                                    placeholder="0.00"
-                                    className={cn("h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold", !!editingAccount && "opacity-50 cursor-not-allowed")}
-                                    disabled={!!editingAccount}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Ej: Cuenta Nómina BBVA..."
+                                    className="pl-12 h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
                                 />
                             </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Tipo</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Saldo Inicial</Label>
+                                <div className="relative group">
+                                    <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        type="number"
+                                        value={balance}
+                                        onChange={(e) => setBalance(e.target.value)}
+                                        placeholder="0.00"
+                                        className={cn("pl-12 h-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-black text-primary text-lg shadow-sm focus:ring-2 focus:ring-primary/20 transition-all", !!editingAccount && "opacity-50 cursor-not-allowed")}
+                                        disabled={!!editingAccount}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Tipo</Label>
                                 <Select value={typeId} onValueChange={setTypeId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue placeholder="Elegir..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {accountTypes.map(t => (
-                                            <SelectItem key={t.id} value={t.id} className="font-bold">{t.name}</SelectItem>
+                                            <SelectItem key={t.id} value={t.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{t.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -691,30 +706,30 @@ export default function AccountsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Identificador Visual (Color)</Label>
-                            <div className="flex items-center gap-4">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Identificador Visual (Color)</Label>
+                            <div className="flex items-center gap-4 bg-slate-50 dark:bg-meta-4/20 p-2 rounded-xl border border-dashed border-stroke dark:border-strokedark">
                                 <Input
                                     type="color"
                                     value={color}
                                     onChange={(e) => setColor(e.target.value)}
-                                    className="h-11 w-20 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark p-1 cursor-pointer rounded-md"
+                                    className="h-12 w-20 bg-white dark:bg-meta-4 border-none p-1 cursor-pointer rounded-lg shadow-sm"
                                 />
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{color}</span>
+                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{color}</span>
                             </div>
                         </div>
                     </div>
 
-                    <DialogFooter className="p-4 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row justify-end gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
                         <Button
                             variant="ghost"
                             onClick={() => setIsModalOpen(false)}
-                            className="h-11 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-black dark:hover:text-white px-6 transition-colors"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
                         >
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleSave}
-                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md font-black uppercase text-[10px] tracking-widest h-11 px-10 shadow-md cursor-pointer transition-colors disabled:cursor-not-allowed disabled:pointer-events-auto border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
                         >
                             {editingAccount ? "Actualizar" : "Activar"}
                         </Button>
@@ -724,48 +739,58 @@ export default function AccountsPage() {
 
             {/* Modal de Cuadre de Saldo */}
             <Dialog open={adjustModalOpen} onOpenChange={setAdjustModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col">
-                    <DialogHeader className="bg-primary p-6 sm:p-8 text-white space-y-1 shrink-0">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight flex items-center gap-2">
-                            <Wallet className="w-5 h-5" /> Cuadre de Caja
-                        </DialogTitle>
-                        <DialogDescription className="text-white/70 text-xs font-semibold uppercase tracking-widest italic opacity-70">
-                            Sincronización de Saldo Real
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Wallet className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Cuadre de <span className="text-primary italic">Caja</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    SINCRONIZACIÓN DE SALDO REAL.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-6 sm:p-8 space-y-6">
-                        <div className="bg-slate-50 dark:bg-meta-4 p-4 rounded-md border border-stroke dark:border-strokedark">
-                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cuenta</p>
-                            <p className="text-base font-bold text-black dark:text-white uppercase">{selectedAccount?.name}</p>
-                            <p className="text-xs font-medium text-slate-500 mt-1">Saldo en sistema: {formatCurrency(selectedAccount?.balance || 0)}</p>
+                    <div className="p-6 md:p-8 space-y-6">
+                        <div className="bg-slate-50 dark:bg-meta-4/20 p-5 rounded-xl border border-dashed border-stroke dark:border-strokedark shadow-inner">
+                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest opacity-70 mb-1">Cuenta</p>
+                            <p className="text-lg font-black text-black dark:text-white uppercase tracking-tighter">{selectedAccount?.name}</p>
+                            <p className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">Saldo en sistema: <span className="text-primary">{formatCurrency(selectedAccount?.balance || 0)}</span></p>
                         </div>
 
-                        <div className="space-y-2 text-center">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nuevo Saldo Real</Label>
+                        <div className="space-y-3 text-center">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nuevo Saldo Real</Label>
                             <Input
                                 type="number"
                                 value={targetBalance}
                                 onChange={(e) => setTargetBalance(e.target.value)}
                                 placeholder="0.00"
-                                className="h-14 text-2xl bg-white dark:bg-meta-4 border-2 border-primary/20 focus:border-primary rounded-md font-black text-center text-primary"
+                                className="h-16 text-3xl bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-black text-center text-primary shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
                                 autoFocus
                             />
-                            <p className="text-[10px] text-slate-400 mt-2 font-bold italic">Se generará un ajuste automático para igualar este valor.</p>
+                            <p className="text-[9px] text-slate-400 font-bold italic uppercase tracking-tighter">
+                                Se generará un ajuste automático para igualar este valor.
+                            </p>
                         </div>
                     </div>
 
-                    <DialogFooter className="p-4 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row justify-end gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
                         <Button
                             variant="ghost"
                             onClick={() => setAdjustModalOpen(false)}
-                            className="h-11 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-black dark:hover:text-white px-6 transition-colors"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
                         >
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleAdjustBalance}
-                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-md font-black uppercase text-[10px] tracking-widest h-11 px-10 shadow-md cursor-pointer transition-colors disabled:cursor-not-allowed disabled:pointer-events-auto border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
                         >
                             Confirmar
                         </Button>
@@ -775,43 +800,61 @@ export default function AccountsPage() {
 
             {/* Modal de Reasignación */}
             <Dialog open={isReassignModalOpen} onOpenChange={setIsReassignModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col">
-                    <DialogHeader className="bg-rose-500 p-6 text-white shrink-0">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">Acción Requerida</DialogTitle>
-                        <DialogDescription className="text-rose-100 text-[10px] font-black uppercase tracking-widest italic pt-1">
-                            La cuenta tiene movimientos activos
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col rounded-2xl">
+                    <DialogHeader className="bg-rose-500 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-xl flex items-center justify-center text-white border border-white/20">
+                                <TrendingUp className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">Acción <span className="underline decoration-white/30 italic">Requerida</span></DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase tracking-widest italic pt-1 text-rose-100 opacity-90">
+                                    CUENTA CON MOVIMIENTOS ACTIVOS.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-6 sm:p-8 space-y-6">
-                        <p className="text-sm font-medium text-slate-600 dark:text-slate-400 leading-relaxed">
-                            No es posible eliminar <span className="font-bold text-black dark:text-white">"{accountToDelete?.name}"</span> sin procesar sus registros históricos.
-                            Reubica todos los movimientos a una cuenta alternativa para proceder.
-                        </p>
+                    <div className="p-6 md:p-8 space-y-6">
+                        <div className="p-5 bg-rose-500/5 rounded-xl border border-dashed border-rose-500/20">
+                            <p className="text-sm font-bold text-slate-600 dark:text-slate-400 leading-relaxed uppercase tracking-tight text-center">
+                                NO ES POSIBLE ELIMINAR <span className="text-rose-500 font-black underline decoration-rose-500/20">"{accountToDelete?.name}"</span> SIN PROCESAR SUS REGISTROS HISTÓRICOS.
+                            </p>
+                        </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cuenta de Destino</Label>
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Cuenta de Destino</Label>
                             <Select value={reassignToAccountId} onValueChange={setReassignToAccountId}>
-                                <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm">
                                     <SelectValue placeholder="Seleccionar destino..." />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                     {accounts.filter(acc => acc.id !== accountToDelete?.id).map(acc => (
-                                        <SelectItem key={acc.id} value={acc.id} className="font-bold text-sm">{acc.name}</SelectItem>
+                                        <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{acc.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
+                            <p className="text-[9px] text-slate-400 font-bold italic uppercase tracking-tighter px-1 text-center">
+                                Todos los movimientos serán reubicados permanentemente.
+                            </p>
                         </div>
                     </div>
 
-                    <DialogFooter className="p-6 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex gap-2">
-                        <Button variant="ghost" className="flex-1 h-11 text-[10px] font-black uppercase tracking-widest text-slate-400 rounded-md" onClick={() => setIsReassignModalOpen(false)}>Cancelar</Button>
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsReassignModalOpen(false)}
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                            Cancelar
+                        </Button>
                         <Button
                             onClick={handleReassignAndDelete}
                             disabled={!reassignToAccountId}
-                            className="flex-1 h-11 bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest rounded-md"
+                            className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
                         >
-                            Migrar y Eliminar
+                            Migrar y Borrar
                         </Button>
                     </DialogFooter>
                 </DialogContent>

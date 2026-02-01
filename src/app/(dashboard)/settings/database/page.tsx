@@ -446,48 +446,49 @@ export default function DatabaseSettingsPage() {
 
             {/* Reset Dialog */}
             <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
-                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark bg-rose-500/5">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-rose-500/10 rounded-md flex items-center justify-center text-rose-500">
-                                <AlertTriangle className="w-6 h-6" />
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-500 border border-rose-500/20">
+                                <AlertTriangle className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
-                                    Acción Destructiva
+                                <DialogTitle className="text-xl md:text-2xl font-black text-rose-500 uppercase tracking-tight leading-none mb-1.5">
+                                    Acción <span className="text-white">Destructiva</span>
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none">
-                                    Esta operación no se puede deshacer.
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    ESTA OPERACIÓN NO SE PUEDE DESHACER.
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6">
+                    <div className="p-5 md:p-8 space-y-6 bg-white dark:bg-boxdark overflow-y-auto custom-scrollbar flex-1">
                         {resetStep === 1 ? (
                             <div className="space-y-4">
                                 <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                                    Se van a eliminar <span className="font-bold text-black dark:text-white uppercase">TODOS</span> los registros de la base de datos:
+                                    Se van a eliminar <span className="font-bold text-black dark:text-white uppercase underline decoration-rose-500/30 decoration-2">TODOS</span> los registros de la base de datos:
                                 </p>
-                                <ul className="space-y-2 text-[11px] font-bold uppercase tracking-tight text-slate-500">
-                                    <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-rose-500" /> Todas las Transacciones</li>
+                                <ul className="space-y-3 p-4 bg-slate-50 dark:bg-meta-4/20 rounded-xl border border-stroke dark:border-strokedark text-[11px] font-bold uppercase tracking-tight text-slate-500">
+                                    <li className="flex items-center gap-3"><XCircle className="w-4 h-4 text-rose-500" /> Todas las Transacciones</li>
                                     <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-rose-500" /> Todas las Cuentas</li>
                                     <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-rose-500" /> Todas las Categorías</li>
-                                    <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-rose-500" /> Todos los Usuarios (excepto admin@moneyo.com)</li>
+                                    <li className="flex items-center gap-2"><XCircle className="w-4 h-4 text-rose-500" /> Todos los Usuarios (excepto admin)</li>
                                 </ul>
-                                <div className="pt-4 p-4 bg-orange-500/10 border border-orange-500/20 rounded-md text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-tight">
+                                <div className="p-4 bg-orange-500/5 border border-orange-500/10 rounded-xl text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase tracking-widest leading-relaxed">
                                     ADVERTENCIA: Deberás volver a iniciar sesión después de esta operación.
                                 </div>
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Confirmación de Seguridad</Label>
-                                <p className="text-xs text-slate-600 dark:text-slate-400 font-medium italic">
-                                    Para confirmar la eliminación total, escribe la palabra clave <span className="font-black text-rose-500 uppercase">'moneyo'</span> a continuación.
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 opacity-70">Confirmación de Seguridad</Label>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium italic">
+                                    Para confirmar la eliminación total, escribe la palabra clave <span className="font-black text-rose-500 uppercase tracking-widest">'moneyo'</span> a continuación.
                                 </p>
                                 <Input
                                     placeholder="Escribe la palabra clave aquí..."
-                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-rose-500/30 font-bold text-center text-sm uppercase tracking-widest"
+                                    className="h-12 bg-slate-50 dark:bg-meta-4/40 border-rose-500/20 rounded-xl font-black text-center text-sm uppercase tracking-[0.3em] text-rose-500 shadow-inner"
                                     value={resetKeyword}
                                     onChange={(e) => setResetKeyword(e.target.value.toLowerCase())}
                                 />
@@ -495,18 +496,18 @@ export default function DatabaseSettingsPage() {
                         )}
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 flex gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 shrink-0 border-t border-stroke dark:border-strokedark">
                         <Button
                             variant="ghost"
                             onClick={() => setIsResetDialogOpen(false)}
-                            className="flex-1 h-12 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             Cancelar
                         </Button>
                         {resetStep === 1 ? (
                             <Button
                                 onClick={() => setResetStep(2)}
-                                className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px]"
+                                className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-black uppercase tracking-widest h-12 text-[10px] shadow-lg shadow-rose-500/20 active:scale-[0.98] transition-all"
                             >
                                 Siguiente Paso
                             </Button>
@@ -514,7 +515,7 @@ export default function DatabaseSettingsPage() {
                             <Button
                                 onClick={handleSystemReset}
                                 disabled={resetKeyword !== "moneyo" || isReseting}
-                                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px] shadow-lg shadow-rose-500/20"
+                                className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black uppercase tracking-widest h-12 text-[10px] shadow-xl shadow-rose-600/30 border-none active:scale-[0.98] transition-all"
                             >
                                 {isReseting ? <Loader2 className="w-4 h-4 animate-spin" /> : "BORRAR TODO"}
                             </Button>
@@ -525,42 +526,45 @@ export default function DatabaseSettingsPage() {
 
             {/* Restore DB Confirmation Dialog */}
             <Dialog open={isRestoreDbDialogOpen} onOpenChange={setIsRestoreDbDialogOpen}>
-                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
-                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark bg-rose-500/5">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-rose-500/10 rounded-md flex items-center justify-center text-rose-500">
-                                <AlertTriangle className="w-6 h-6" />
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-rose-500/10 rounded-xl flex items-center justify-center text-rose-500 border border-rose-500/20">
+                                <AlertTriangle className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
-                                    Confirmar Restauración
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Confirmar <span className="text-rose-500 italic">Restauración</span>
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none">
-                                    Esta acción reemplazará los datos.
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    ESTA ACCIÓN REEMPLAZARÁ LOS DATOS.
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
-                    <div className="p-8 space-y-4">
-                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                            Estás a punto de restaurar la base de datos desde el archivo <span className="font-bold text-black dark:text-white">{restoreFile?.name}</span>.
-                        </p>
-                        <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-md text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-tight flex gap-3">
-                            <AlertTriangle className="w-5 h-5 shrink-0" />
-                            <span>Se eliminarán todos los datos actuales y serán reemplazados por los del respaldo.</span>
+                    <div className="p-5 md:p-8 space-y-6 bg-white dark:bg-boxdark flex-1">
+                        <div className="space-y-4">
+                            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                                Estás a punto de restaurar la base de datos desde el archivo <span className="font-black text-black dark:text-white underline decoration-primary/30 decoration-2">{restoreFile?.name}</span>.
+                            </p>
+                            <div className="p-5 bg-rose-500/5 border border-rose-500/10 rounded-2xl text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-widest leading-relaxed flex gap-4">
+                                <AlertCircle className="w-6 h-6 shrink-0" />
+                                <span>SE ELIMINARÁN TODOS LOS DATOS ACTUALES Y SERÁN REEMPLAZADOS POR LOS DEL RESPALDO SIN POSIBILIDAD DE MARCHA ATRÁS.</span>
+                            </div>
                         </div>
                     </div>
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 flex gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 shrink-0 border-t border-stroke dark:border-strokedark">
                         <Button
                             variant="ghost"
                             onClick={() => setIsRestoreDbDialogOpen(false)}
-                            className="flex-1 h-12 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleRestore}
-                            className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px]"
+                            className="flex-1 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black uppercase tracking-widest h-12 text-[10px] shadow-lg shadow-rose-600/20 active:scale-[0.98] transition-all border-none"
                         >
                             Confirmar y Restaurar
                         </Button>
@@ -570,42 +574,45 @@ export default function DatabaseSettingsPage() {
 
             {/* Restore Uploads Confirmation Dialog */}
             <Dialog open={isRestoreUploadsDialogOpen} onOpenChange={setIsRestoreUploadsDialogOpen}>
-                <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden bg-white dark:bg-boxdark border-none shadow-2xl rounded-md">
-                    <DialogHeader className="p-8 border-b border-stroke dark:border-strokedark bg-orange-500/5">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-orange-500/10 rounded-md flex items-center justify-center text-orange-500">
-                                <FolderSync className="w-6 h-6" />
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-orange-500/10 rounded-xl flex items-center justify-center text-orange-500 border border-orange-500/20">
+                                <FolderSync className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div>
-                                <DialogTitle className="text-lg font-black text-black dark:text-white uppercase tracking-tight leading-none mb-1.5">
-                                    Restaurar Archivos
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Restaurar <span className="text-orange-500 italic">Archivos</span>
                                 </DialogTitle>
-                                <DialogDescription className="text-[10px] font-black uppercase text-orange-500 tracking-widest leading-none">
-                                    Reemplazo de archivos multimedia
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    REEMPLAZO DE ARCHIVOS MULTIMEDIA.
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
-                    <div className="p-8 space-y-4">
-                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                            Estás a punto de restaurar la carpeta de uploads desde <span className="font-bold text-black dark:text-white">{restoreUploadsFile?.name}</span>.
-                        </p>
-                        <div className="p-4 bg-orange-500/10 border border-orange-500/20 rounded-md text-orange-600 dark:text-orange-400 text-xs font-bold uppercase tracking-tight flex gap-3">
-                            <AlertTriangle className="w-5 h-5 shrink-0" />
-                            <span>Se eliminarán todos los archivos actuales en /public/uploads/ antes de la restauración.</span>
+                    <div className="p-5 md:p-8 space-y-6 bg-white dark:bg-boxdark flex-1">
+                        <div className="space-y-4">
+                            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                                Estás a punto de restaurar la carpeta de uploads desde <span className="font-black text-black dark:text-white underline decoration-orange-500/30 decoration-2">{restoreUploadsFile?.name}</span>.
+                            </p>
+                            <div className="p-5 bg-orange-500/5 border border-orange-500/10 rounded-2xl text-orange-600 dark:text-orange-400 text-[10px] font-black uppercase tracking-widest leading-relaxed flex gap-4">
+                                <AlertTriangle className="w-6 h-6 shrink-0" />
+                                <span>SE ELIMINARÁN TODOS LOS ARCHIVOS ACTUALES EN /PUBLIC/UPLOADS/ ANTES DE LA RESTAURACIÓN.</span>
+                            </div>
                         </div>
                     </div>
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 flex gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 flex flex-row gap-3 shrink-0 border-t border-stroke dark:border-strokedark">
                         <Button
                             variant="ghost"
                             onClick={() => setIsRestoreUploadsDialogOpen(false)}
-                            className="flex-1 h-12 rounded-md font-black uppercase text-[10px] tracking-widest text-slate-400"
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
                             Cancelar
                         </Button>
                         <Button
                             onClick={handleRestoreUploads}
-                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-md font-black uppercase tracking-widest h-12 text-[10px]"
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black uppercase tracking-widest h-12 text-[10px] shadow-lg shadow-orange-600/20 active:scale-[0.98] transition-all border-none"
                         >
                             Confirmar y Restaurar
                         </Button>

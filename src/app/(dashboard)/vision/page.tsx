@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { VisionUploader } from "@/components/VisionUploader";
 import { VisionResultModal } from "@/components/VisionResultModal";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'recharts';
 
 export default function VisionPage() {
@@ -428,45 +428,73 @@ export default function VisionPage() {
             />
 
             <Dialog open={!!viewingTx} onOpenChange={() => setViewingTx(null)}>
-                <DialogContent className="sm:max-w-3xl bg-white rounded-3xl border-none shadow-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                    <DialogHeader className="p-6 pb-2">
-                        <DialogTitle className="text-xl font-bold text-slate-900">
-                            Documentos Adjuntos
-                        </DialogTitle>
+                <DialogContent className="w-[95vw] sm:max-w-4xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh] rounded-3xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Paperclip className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Documentos <span className="text-primary italic">Adjuntos</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    VISUALIZACIÓN DE COMPROBANTES Y FACTURAS.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
-                    <div className="flex-1 overflow-y-auto p-6 pt-0 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <div className="flex-1 overflow-y-auto p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 custom-scrollbar bg-slate-50/50 dark:bg-meta-4/10">
                         {(viewingTx?.images?.length > 0 || viewingTx?.imageUrls?.length > 0) ? (
                             (viewingTx.images?.map((img: any) => img.url) || viewingTx.imageUrls).map((url: string, index: number) => (
-                                <div key={index} className="rounded-xl overflow-hidden border border-slate-100 shadow-sm group relative">
+                                <Card key={index} className="rounded-2xl overflow-hidden border-none shadow-sm dark:shadow-none bg-white dark:bg-boxdark group relative aspect-[3/4] flex items-center justify-center">
                                     {url.toLowerCase().endsWith('.pdf') ? (
-                                        <object data={url} type="application/pdf" className="w-full h-96 bg-slate-50" aria-label={`Visor de PDF para el documento ${index + 1}`} />
+                                        <object data={url} type="application/pdf" className="w-full h-full" aria-label={`Visor de PDF ${index + 1}`}>
+                                            <div className="p-10 text-center">
+                                                <p className="text-xs font-bold text-slate-400">No se puede previsualizar el PDF directamente.</p>
+                                                <Button variant="link" asChild className="mt-2">
+                                                    <a href={url} target="_blank" rel="noopener noreferrer">Abrir en nueva pestaña</a>
+                                                </Button>
+                                            </div>
+                                        </object>
                                     ) : (
-                                        <img src={url} alt={`Documento ${index + 1}`} className="w-full h-auto object-contain bg-slate-50" />
+                                        <img src={url} alt={`Documento ${index + 1}`} className="w-full h-full object-contain" />
                                     )}
-                                    <div className="absolute bottom-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm">
-                                        {index + 1} / {(viewingTx.images || viewingTx.imageUrls).length}
+                                    <div className="absolute bottom-4 left-4 bg-black/60 text-white text-[10px] font-black px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 uppercase tracking-widest">
+                                        Pág {index + 1} / {(viewingTx.images || viewingTx.imageUrls).length}
                                     </div>
-                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 translate-y-2 group-hover:translate-y-0">
                                         <a href={url} download target="_blank" rel="noopener noreferrer">
-                                            <Button size="icon" variant="ghost" className="bg-white/50 hover:bg-white rounded-full h-9 w-9">
-                                                <Download className="w-4 h-4 text-slate-700" />
+                                            <Button size="icon" className="bg-white dark:bg-boxdark-2 text-primary shadow-xl rounded-full h-11 w-11 hover:scale-110 active:scale-95 transition-all">
+                                                <Download className="w-5 h-5" />
                                             </Button>
                                         </a>
                                     </div>
-                                </div>
+                                </Card>
                             ))
                         ) : viewingTx?.attachmentPath && (
-                            <div className="rounded-xl overflow-hidden border border-slate-100 shadow-sm group relative">
-                                <img src={viewingTx.attachmentPath} alt="Documento" className="w-full h-auto object-contain bg-slate-50" />
-                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Card className="rounded-2xl overflow-hidden border-none shadow-sm dark:shadow-none bg-white dark:bg-boxdark group relative aspect-[3/4] flex items-center justify-center col-span-full max-w-lg mx-auto w-full">
+                                <img src={viewingTx.attachmentPath} alt="Documento" className="w-full h-full object-contain" />
+                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 translate-y-2 group-hover:translate-y-0">
                                     <a href={viewingTx.attachmentPath} download target="_blank" rel="noopener noreferrer">
-                                        <Button size="icon" variant="ghost" className="bg-white/50 hover:bg-white rounded-full h-9 w-9">
-                                            <Download className="w-4 h-4 text-slate-700" />
+                                        <Button size="icon" className="bg-white dark:bg-boxdark-2 text-primary shadow-xl rounded-full h-11 w-11">
+                                            <Download className="w-5 h-5" />
                                         </Button>
                                     </a>
                                 </div>
-                            </div>
+                            </Card>
                         )}
+                    </div>
+
+                    <div className="p-6 md:p-8 bg-white dark:bg-boxdark border-t border-stroke dark:border-strokedark flex justify-end shrink-0">
+                        <Button
+                            onClick={() => setViewingTx(null)}
+                            className="bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl px-8 h-12 font-black uppercase text-[10px] tracking-[0.2em] shadow-lg border-none hover:scale-[1.02] active:scale-[0.98] transition-all"
+                        >
+                            Cerrar Visualizador
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>

@@ -666,28 +666,78 @@ export default function TransactionsPage() {
             )}
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                    <DialogHeader className="bg-boxdark p-8 text-white shrink-0"><DialogTitle className="text-xl font-bold uppercase">{editingTx ? "Editar" : "Nuevo"} Movimiento</DialogTitle></DialogHeader>
-                    <div className="p-8 space-y-6 overflow-y-auto flex-1 min-h-0">
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-2"><Label className="text-[10px] font-black uppercase text-slate-400">Tipo</Label><Select value={type} onValueChange={setType}><SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 font-bold"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="GASTO" className="text-rose-500 font-bold">GASTO</SelectItem><SelectItem value="INGRESO" className="text-emerald-500 font-bold">INGRESO</SelectItem><SelectItem value="TRASPASO" className="text-primary font-bold">TRASPASO</SelectItem></SelectContent></Select></div>
-                            <div className="space-y-2"><Label className="text-[10px] font-black uppercase text-slate-400">Importe</Label><Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="h-11 font-black text-lg text-primary text-center bg-primary/5" /></div>
+                <DialogContent className="w-[95vw] sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                {type === "INGRESO" ? <ArrowDownLeft className="w-5 h-5 md:w-6 md:h-6" /> : type === "TRASPASO" ? <ArrowLeftRight className="w-5 h-5 md:w-6 md:h-6" /> : <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6" />}
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    {editingTx ? "Editar" : "Nuevo"} <span className="text-primary italic">Movimiento</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    REGISTRO EN EL LIBRO DIARIO.
+                                </DialogDescription>
+                            </div>
                         </div>
-                        <div className="space-y-2"><Label className="text-[10px] font-black uppercase text-slate-400">Descripción</Label><Input value={description} onChange={(e) => setDescription(e.target.value)} className="h-11 font-bold" /></div>
-                        <div className="grid grid-cols-2 gap-6">
+                    </DialogHeader>
+
+                    <div className="p-6 md:p-8 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Cuenta</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Tipo de Operación</Label>
+                                <Select value={type} onValueChange={setType}>
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="GASTO" className="text-rose-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-rose-500/5 cursor-pointer rounded-lg">GASTO</SelectItem>
+                                        <SelectItem value="INGRESO" className="text-emerald-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-emerald-500/5 cursor-pointer rounded-lg">INGRESO</SelectItem>
+                                        <SelectItem value="TRASPASO" className="text-primary font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">TRASPASO</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Importe</Label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 bg-primary/10 rounded-md text-primary font-black text-xs">€</div>
+                                    <Input
+                                        type="number"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        placeholder="0.00"
+                                        className="h-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-black text-xl text-primary text-center pl-14 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Referencia / Descripción</Label>
+                            <Input
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white px-5 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                                placeholder="Ej: Supermercado Semanal..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">{type === "TRASPASO" ? "Cuenta Origen" : "Cuenta"}</Label>
                                 <Select value={accountId} onValueChange={setAccountId}>
-                                    <SelectTrigger className="h-11 font-bold bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue placeholder="Elegir...">
                                             {accounts.find(a => a.id === accountId)?.name}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
                                                     {acc.name}
                                                 </div>
                                             </SelectItem>
@@ -695,43 +745,57 @@ export default function TransactionsPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="space-y-2"><Label className="text-[10px] font-black uppercase text-slate-400">Fecha</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11 font-bold" /></div>
-                        </div>
-                        {type === "TRASPASO" ? (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 text-primary">Cuenta Destino</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Fecha Valor</Label>
+                                <div className="relative group">
+                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        className="h-12 pl-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {type === "TRASPASO" ? (
+                            <div className="space-y-2 p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-dashed border-primary/20 animate-in slide-in-from-top-2">
+                                <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1">Cuenta Destino</Label>
                                 <Select value={destinationAccountId} onValueChange={setDestinationAccountId}>
-                                    <SelectTrigger className="h-11 font-bold text-primary bg-primary/5 border-primary/20">
-                                        <SelectValue placeholder="Seleccionar...">
+                                    <SelectTrigger className="h-12 bg-white dark:bg-boxdark border-none rounded-xl font-bold text-primary shadow-sm focus:ring-2 focus:ring-primary/40 transition-all">
+                                        <SelectValue placeholder="Seleccionar destino...">
                                             {accounts.find(a => a.id === destinationAccountId)?.name}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {accounts.filter(a => a.id !== accountId).map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: acc.color || '#3c50e0' }} />
                                                     {acc.name}
                                                 </div>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                <p className="text-[9px] text-primary/60 font-black uppercase tracking-widest mt-2 px-1 text-center italic">Operación de Traspaso Interno</p>
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Categoría</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Categoría</Label>
                                 <Select value={categoryId} onValueChange={setCategoryId}>
-                                    <SelectTrigger className="h-11 font-bold bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark">
-                                        <SelectValue placeholder="Opcional...">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Sin categoría (Global)...">
                                             {categories.find(c => c.id === categoryId)?.name}
                                         </SelectValue>
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="none" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-100 dark:focus:bg-meta-4 cursor-pointer rounded-lg text-slate-400 italic">Sin Categoría</SelectItem>
                                         {categories.map(cat => (
-                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                                                     {cat.name}
                                                 </div>
                                             </SelectItem>
@@ -740,14 +804,44 @@ export default function TransactionsPage() {
                                 </Select>
                             </div>
                         )}
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400">Adjuntos</Label>
-                            <Input type="file" multiple onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))} className="h-11 text-xs" />
+
+                        <div className="space-y-2 p-5 bg-slate-50 dark:bg-meta-4/20 rounded-2xl border border-dashed border-stroke dark:border-strokedark/50">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Documentos Adjuntos (JPG, PDF)</Label>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-1 relative group">
+                                    <Paperclip className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        type="file"
+                                        multiple
+                                        onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+                                        className="h-12 pl-12 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer bg-white dark:bg-boxdark border-none rounded-xl font-bold text-[10px] shadow-sm"
+                                    />
+                                </div>
+                                {selectedFiles.length > 0 && (
+                                    <div className="h-12 px-4 bg-primary/10 text-primary font-black rounded-xl border border-primary/20 flex items-center justify-center text-[10px] uppercase animate-in zoom-in">
+                                        {selectedFiles.length}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t flex flex-row gap-3">
-                        <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 uppercase text-[10px] font-black">Cancelar</Button>
-                        <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white uppercase text-[10px] font-black">{isUploading ? "Guardando..." : "Registrar"}</Button>
+
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsModalOpen(false)}
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleSave}
+                            disabled={isUploading}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
+                        >
+                            {isUploading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            {editingTx ? "Actualizar" : "Registrar"}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -936,43 +1030,54 @@ export default function TransactionsPage() {
 
             {/* Bulk Edit Modal */}
             <Dialog open={isBulkEditModalOpen} onOpenChange={setIsBulkEditModalOpen}>
-                <DialogContent className="w-[95vw] sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                    <DialogHeader className="bg-boxdark p-8 text-white shrink-0">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">
-                            Edición Masiva
-                        </DialogTitle>
-                        <DialogDescription className="text-white/70 text-xs font-semibold uppercase tracking-widest italic mt-1">
-                            Actualizando {selectedIds.length} movimientos seleccionados
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Settings className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Edición <span className="text-primary italic">Masiva</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    PROCESANDO {selectedIds.length} MOVIMIENTOS.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6 overflow-y-auto flex-1 min-h-0">
-                        <div className="grid grid-cols-2 gap-6">
+                    <div className="p-6 md:p-8 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Nuevo Tipo</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nuevo Tipo</Label>
                                 <Select value={bulkType} onValueChange={setBulkType}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 font-bold border-stroke dark:border-strokedark rounded-md">
-                                        <SelectValue placeholder="Sin cambios" />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Mantener originales..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
-                                        <SelectItem value="GASTO" className="text-rose-500 font-bold">GASTO</SelectItem>
-                                        <SelectItem value="INGRESO" className="text-emerald-500 font-bold">INGRESO</SelectItem>
-                                        <SelectItem value="TRASPASO" className="text-primary font-bold">TRASPASO</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">No modificar</SelectItem>
+                                        <SelectItem value="GASTO" className="text-rose-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-rose-500/5 cursor-pointer rounded-lg">GASTO</SelectItem>
+                                        <SelectItem value="INGRESO" className="text-emerald-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-emerald-500/5 cursor-pointer rounded-lg">INGRESO</SelectItem>
+                                        <SelectItem value="TRASPASO" className="text-primary font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">TRASPASO</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Nueva Categoría</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nueva Categoría</Label>
                                 <Select value={bulkCategoryId} onValueChange={setBulkCategoryId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 font-bold border-stroke dark:border-strokedark rounded-md">
-                                        <SelectValue placeholder="Sin cambios" />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Mantener originales..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">No modificar</SelectItem>
                                         {categories.map(cat => (
-                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
-                                                <div className="flex items-center gap-2 font-bold">{cat.name}</div>
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    {cat.name}
+                                                </div>
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -980,32 +1085,34 @@ export default function TransactionsPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400">Nueva Cuenta (Origen)</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nueva Cuenta (Origen)</Label>
                                 <Select value={bulkAccountId} onValueChange={setBulkAccountId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 font-bold border-stroke dark:border-strokedark rounded-md">
-                                        <SelectValue placeholder="Sin cambios" />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Mantener originales..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">No modificar</SelectItem>
                                         {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
+                                                <div className="flex items-center gap-2 font-bold">{acc.name}</div>
+                                            </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                             {bulkType === "TRASPASO" && (
-                                <div className="space-y-2 animate-in fade-in slide-in-from-left-2">
-                                    <Label className="text-[10px] font-black uppercase text-primary">Nueva Cuenta Destino</Label>
+                                <div className="space-y-2 p-4 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-dashed border-primary/20 animate-in slide-in-from-left-2">
+                                    <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1">Nueva Cuenta Destino</Label>
                                     <Select value={bulkDestinationAccountId} onValueChange={setBulkDestinationAccountId}>
-                                        <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary">
-                                            <SelectValue placeholder="Sin cambios" />
+                                        <SelectTrigger className="h-12 bg-white dark:bg-boxdark border-none rounded-xl font-bold text-primary shadow-sm focus:ring-2 focus:ring-primary/40 transition-all">
+                                            <SelectValue placeholder="Seleccionar destino..." />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                            <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                        <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                            <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg text-primary/40 italic">No modificar</SelectItem>
                                             {accounts.map(acc => (
-                                                <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                                <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{acc.name}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -1014,10 +1121,21 @@ export default function TransactionsPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
-                        <Button variant="ghost" onClick={() => setIsBulkEditModalOpen(false)} className="flex-1 rounded-md font-bold uppercase text-[10px] tracking-widest text-slate-400 h-12 transition-all hover:bg-slate-100 dark:hover:bg-white/5">Cancelar</Button>
-                        <Button onClick={handleBulkUpdate} disabled={isBulkUpdating} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-bold uppercase text-[10px] tracking-widest h-12 shadow-md border-none transition-all active:scale-95">
-                            {isBulkUpdating ? "Actualizando..." : "Aplicar Cambios"}
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsBulkEditModalOpen(false)}
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleBulkUpdate}
+                            disabled={isBulkUpdating}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
+                        >
+                            {isBulkUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            Aplicar Cambios
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -1026,29 +1144,28 @@ export default function TransactionsPage() {
             {/* Image Viewer Modal */}
             <Dialog open={!!viewingTx} onOpenChange={(open) => !open && setViewingTx(null)}>
                 <DialogContent className="w-screen h-[100dvh] max-w-none m-0 rounded-none bg-black/95 border-none shadow-none p-0 overflow-hidden flex flex-col z-[150]">
-                    <DialogHeader className="bg-gradient-to-b from-black/80 to-transparent absolute top-0 left-0 right-0 z-50 p-4 sm:p-6 pb-12 transition-all">
-                        <div className="flex justify-between items-start w-full max-w-7xl mx-auto">
-                            <div className="flex flex-col gap-1 mt-1">
-                                <DialogTitle className="text-white/90 text-sm font-black uppercase tracking-[0.2em] drop-shadow-md flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-                                    Visor de Adjuntos
-                                </DialogTitle>
-                                <p className="text-white/50 text-[10px] font-medium tracking-wide truncate max-w-[200px] mobile:max-w-[150px]">
-                                    {viewingTx?.description}
-                                </p>
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 absolute top-0 left-0 right-0 z-50 p-6 md:p-8 flex flex-row items-center justify-between border-b border-white/5 transition-all">
+                        <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl flex items-center justify-center text-white border border-white/10">
+                                <Paperclip className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
-                            <DialogDescription className="sr-only">
-                                Visor de archivos adjuntos para la transacción {viewingTx?.id}
-                            </DialogDescription>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setViewingTx(null)}
-                                className="text-white hover:text-rose-400 hover:bg-white/10 rounded-full h-10 w-10 transition-colors backdrop-blur-sm bg-black/20"
-                            >
-                                <X className="w-6 h-6" />
-                            </Button>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Visor de <span className="text-primary italic">Adjuntos</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    {viewingTx?.description}
+                                </DialogDescription>
+                            </div>
                         </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setViewingTx(null)}
+                            className="text-white hover:text-rose-400 hover:bg-white/10 rounded-full h-12 w-12 transition-colors"
+                        >
+                            <X className="w-8 h-8" />
+                        </Button>
                     </DialogHeader>
 
                     <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 pt-16 flex flex-col items-center justify-center min-h-[300px] w-full">
@@ -1232,39 +1349,41 @@ const TransactionRow = memo(({ tx, isSelected, toggleSelect, handleToggleVerify,
                             </Button>
 
                             {/* Mobile Bottom Sheet Action Menu */}
-                            <DialogContent className="w-screen max-w-none m-0 rounded-t-[20px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.2)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200] data-[state=closed]:slide-out-to-bottom data-[state=closed]:translate-y-0">
-                                <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-3 mb-2" /> {/* Drag Handle */}
+                            <DialogContent className="w-[98vw] max-w-none m-0 rounded-t-[32px] rounded-b-none bg-white dark:bg-boxdark border-none shadow-[0_-10px_40px_rgba(0,0,0,0.3)] p-0 flex flex-col fixed bottom-0 left-0 right-0 top-auto translate-x-0 translate-y-0 max-h-[85vh] h-auto animate-in slide-in-from-bottom duration-300 z-[200]">
+                                <div className="w-12 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mt-4 mb-2 opacity-50" />
 
-                                <DialogHeader className="px-6 pb-2 text-left">
-                                    <DialogTitle className="text-lg font-black uppercase text-slate-800 dark:text-white tracking-tight">Opciones</DialogTitle>
-                                    <DialogDescription className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                                <DialogHeader className="px-8 pb-4 text-left">
+                                    <DialogTitle className="text-2xl font-black uppercase text-slate-800 dark:text-white tracking-tighter">Opciones de <span className="text-primary italic">Movimiento</span></DialogTitle>
+                                    <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-slate-400 opacity-70">
                                         {formatDate(tx.date)} • {tx.description}
                                     </DialogDescription>
                                 </DialogHeader>
 
-                                <div className="flex flex-col p-4 gap-2 pb-8 overflow-y-auto flex-1 min-h-0">
-                                    <Button onClick={() => { setIsMobileMenuOpen(false); onEdit(tx); }} variant="outline" className="h-14 justify-start px-6 rounded-2xl gap-4 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-meta-4/30 hover:bg-slate-100 dark:hover:bg-meta-4/50 text-slate-700 dark:text-white font-bold uppercase tracking-widest text-xs shadow-sm">
-                                        <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><Pencil className="w-4 h-4" /></div> Editar Movimiento
+                                <div className="flex flex-col p-6 gap-3 pb-12 overflow-y-auto flex-1 min-h-0">
+                                    <Button onClick={() => { setIsMobileMenuOpen(false); onEdit(tx); }} variant="outline" className="h-16 justify-start px-6 rounded-2xl gap-5 border-none bg-slate-50 dark:bg-meta-4/20 hover:bg-slate-100 dark:hover:bg-meta-4/40 text-slate-700 dark:text-white font-black uppercase tracking-widest text-xs shadow-sm transition-all active:scale-[0.98]">
+                                        <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm text-primary"><Pencil className="w-5 h-5" /></div>
+                                        <span>Editar Movimiento</span>
                                     </Button>
 
                                     {((tx.images && tx.images.length > 0) || tx.attachmentPath || (tx.imageUrls && tx.imageUrls.length > 0)) && (
-                                        <Button onClick={() => { setIsMobileMenuOpen(false); setViewingTx(tx); }} variant="outline" className="h-14 justify-start px-6 rounded-2xl gap-4 border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-meta-4/30 hover:bg-slate-100 dark:hover:bg-meta-4/50 text-slate-700 dark:text-white font-bold uppercase tracking-widest text-xs shadow-sm">
-                                            <div className="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm"><Paperclip className="w-4 h-4" /></div> Ver Adjuntos
+                                        <Button onClick={() => { setIsMobileMenuOpen(false); setViewingTx(tx); }} variant="outline" className="h-16 justify-start px-6 rounded-2xl gap-5 border-none bg-slate-50 dark:bg-meta-4/20 hover:bg-slate-100 dark:hover:bg-meta-4/40 text-slate-700 dark:text-white font-black uppercase tracking-widest text-xs shadow-sm transition-all active:scale-[0.98]">
+                                            <div className="w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm text-primary"><Paperclip className="w-5 h-5" /></div>
+                                            <span>Ver Adjuntos</span>
                                         </Button>
                                     )}
 
-                                    <div className="grid grid-cols-2 gap-2 mt-2">
-                                        <Button onClick={() => { setIsMobileMenuOpen(false); onClone(tx); }} variant="outline" className="h-12 justify-center gap-2 rounded-xl border-slate-100 dark:border-slate-800 bg-white dark:bg-meta-4/10 hover:bg-slate-50 text-slate-600 dark:text-white font-bold uppercase tracking-widest text-[10px]">
+                                    <div className="grid grid-cols-2 gap-3 mt-2">
+                                        <Button onClick={() => { setIsMobileMenuOpen(false); onClone(tx); }} variant="outline" className="h-14 justify-center gap-2 rounded-2xl border-none bg-slate-50 dark:bg-meta-4/20 hover:bg-slate-100 text-slate-600 dark:text-white font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-all">
                                             <Copy className="w-3.5 h-3.5" /> Clonar
                                         </Button>
-                                        <Button onClick={() => { setIsMobileMenuOpen(false); onCloneToRecurring(tx); }} variant="outline" className="h-12 justify-center gap-2 rounded-xl border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest text-[10px]">
+                                        <Button onClick={() => { setIsMobileMenuOpen(false); onCloneToRecurring(tx); }} variant="outline" className="h-14 justify-center gap-2 rounded-2xl border-none bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-all">
                                             <Repeat className="w-3.5 h-3.5" /> Programar
                                         </Button>
                                     </div>
 
-                                    <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+                                    <div className="h-px bg-slate-100 dark:bg-slate-800/50 my-2" />
 
-                                    <Button onClick={() => { setIsMobileMenuOpen(false); handleDelete(tx.id); }} variant="ghost" className="h-12 justify-center gap-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 font-black uppercase tracking-widest text-[10px]">
+                                    <Button onClick={() => { setIsMobileMenuOpen(false); handleDelete(tx.id); }} variant="ghost" className="h-14 justify-center gap-2 rounded-2xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 font-black uppercase tracking-widest text-[10px] active:scale-[0.98] transition-all">
                                         <Trash2 className="w-4 h-4" /> Eliminar Movimiento
                                     </Button>
                                 </div>

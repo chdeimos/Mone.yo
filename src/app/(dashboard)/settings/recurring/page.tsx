@@ -13,16 +13,12 @@ import {
     ArrowLeftRight,
     Calendar,
     Clock,
-    Tags,
-    Wallet,
-    History,
     CheckCircle,
     Circle,
     Check,
     X,
     Loader2,
-    Filter,
-    ArrowRight
+    RefreshCcw,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -289,68 +285,74 @@ export default function RecurringPage() {
 
     return (
         <div className="space-y-6">
-            {/* Header / Breadcrumbs */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in duration-500 mb-6">
+            {/* Header / Breadcrumb */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 px-4 md:px-0">
                 <div>
-                    <h1 className="text-2xl font-bold text-black dark:text-white uppercase tracking-tight">
-                        Movimientos Recurrentes
+                    <h1 className="text-3xl font-black text-black dark:text-white uppercase tracking-tight leading-none mb-2">
+                        Recurrencias
                     </h1>
-                    <nav className="flex mt-1">
-                        <ol className="flex items-center space-x-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                            <li><Link href="/" className="hover:text-primary transition-colors">Dashboard</Link></li>
-                            <li><span className="mx-1">/</span></li>
-                            <li><Link href="/settings" className="hover:text-primary transition-colors">Configuración</Link></li>
-                            <li><span className="mx-1">/</span></li>
-                            <li className="text-primary">Recurrencias</li>
-                        </ol>
+                    <nav className="flex items-center space-x-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] opacity-70">
+                        <Link href="/" className="hover:text-primary transition-colors">Dashboard</Link>
+                        <span>/</span>
+                        <Link href="/settings" className="hover:text-primary transition-colors">Configuración</Link>
+                        <span>/</span>
+                        <span className="text-primary">Recurrencias</span>
                     </nav>
                 </div>
                 <Button
                     onClick={() => { resetForm(); setIsModalOpen(true); }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold h-11 px-8 rounded-md gap-3 shadow-md transition-all active:scale-95 uppercase text-[10px] tracking-widest border-none"
+                    className="bg-primary hover:bg-primary-dark text-white font-black h-14 md:h-12 px-8 rounded-xl gap-3 shadow-lg shadow-primary/20 transition-all active:scale-95 uppercase text-[10px] tracking-[0.2em] border-none w-full md:w-auto"
                 >
-                    <Plus className="w-4 h-4" /> Nueva
+                    <Plus className="w-5 h-5" /> Nueva Recurrencia
                 </Button>
             </div>
 
             {/* Bulk Actions Bar */}
             {selectedIds.length > 0 && (
-                <div className="bg-primary/10 border border-primary/20 p-4 rounded-xl flex items-center justify-between animate-in slide-in-from-top-4 duration-300">
-                    <div className="flex items-center gap-4">
-                        <div onClick={toggleSelectAll} className="cursor-pointer">
+                <div className="mx-4 md:mx-0 bg-slate-900 dark:bg-boxdark border-none p-4 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top-6 duration-500 shadow-2xl relative overflow-hidden group mb-8">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-50" />
+                    <div className="flex items-center gap-6 relative z-10">
+                        <div
+                            onClick={toggleSelectAll}
+                            className="cursor-pointer w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 border border-white/10"
+                        >
                             {selectedIds.length === recurrences.length ? (
-                                <CheckCircle className="w-5 h-5 text-primary" />
+                                <CheckCircle className="w-5 h-5 text-primary shadow-[0_0_15px_rgba(60,80,224,0.5)]" />
                             ) : (
-                                <div className="w-5 h-5 border-2 border-primary/30 rounded-full flex items-center justify-center">
-                                    <div className="w-2 h-2 bg-primary rounded-full" />
-                                </div>
+                                <div className="w-2.5 h-2.5 bg-white/20 rounded-sm" />
                             )}
                         </div>
-                        <span className="text-sm font-bold text-primary uppercase tracking-widest">
-                            {selectedIds.length} Seleccionados
-                        </span>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-black text-white uppercase tracking-[0.1em]">
+                                {selectedIds.length} Recurrencias
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                                Seleccionadas para acción masiva
+                            </span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 relative z-10 w-full md:w-auto">
                         <Button
                             variant="ghost"
                             onClick={() => setIsBulkEditModalOpen(true)}
-                            className="h-10 px-4 gap-2 text-[10px] font-black uppercase text-primary hover:bg-primary/20"
+                            className="flex-1 md:flex-none h-11 px-6 gap-2 text-[10px] font-black uppercase text-slate-200 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                         >
-                            <Settings className="w-4 h-4" /> Editar Categoría/Cuenta
+                            <Settings className="w-4 h-4" /> <span>Editar</span>
                         </Button>
                         <Button
                             variant="ghost"
                             onClick={handleBulkDelete}
                             disabled={isBulkDeleting}
-                            className="h-10 px-4 gap-2 text-[10px] font-black uppercase text-rose-500 hover:bg-rose-500/10"
+                            className="flex-1 md:flex-none h-11 px-6 gap-2 text-[10px] font-black uppercase text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 rounded-xl transition-all"
                         >
                             {isBulkDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                            Eliminar
+                            <span>Eliminar</span>
                         </Button>
+                        <div className="w-px h-8 bg-white/10 mx-2 hidden md:block" />
                         <Button
                             variant="ghost"
                             onClick={() => setSelectedIds([])}
-                            className="h-10 w-10 p-0 text-slate-400 hover:text-black dark:hover:text-white"
+                            className="h-11 w-11 p-0 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl transition-all"
                         >
                             <X className="w-5 h-5" />
                         </Button>
@@ -359,125 +361,136 @@ export default function RecurringPage() {
             )}
 
             {/* List */}
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 px-4 md:px-0">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 text-slate-400 space-y-4 bg-white dark:bg-boxdark rounded-md">
-                        <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
-                        <p className="font-bold text-xs uppercase tracking-widest">Sincronizando Suscripciones...</p>
+                    <div className="flex flex-col items-center justify-center py-24 text-slate-400 space-y-6 bg-white dark:bg-boxdark rounded-2xl border border-stroke dark:border-strokedark shadow-sm">
+                        <div className="relative">
+                            <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Clock className="w-4 h-4 text-primary animate-pulse" />
+                            </div>
+                        </div>
+                        <p className="font-black text-[10px] uppercase tracking-[0.2em] text-primary">Sincronizando registros...</p>
                     </div>
                 ) : recurrences.length === 0 ? (
-                    <div className="p-20 text-center flex flex-col items-center gap-4 bg-white dark:bg-boxdark rounded-md border border-dashed border-stroke dark:border-strokedark">
-                        <div className="w-16 h-16 bg-blue-50 dark:bg-meta-4 rounded-full flex items-center justify-center">
-                            <Repeat className="w-8 h-8 text-blue-300" />
+                    <div className="p-24 text-center flex flex-col items-center gap-6 bg-white dark:bg-boxdark rounded-2xl border border-dashed border-stroke dark:border-strokedark shadow-sm animate-in fade-in zoom-in duration-500">
+                        <div className="w-20 h-20 bg-blue-50 dark:bg-meta-4 rounded-3xl flex items-center justify-center shadow-inner">
+                            <Repeat className="w-10 h-10 text-blue-300" />
                         </div>
-                        <p className="text-slate-400 font-bold uppercase text-xs tracking-widest">No hay movimientos recurrentes activos</p>
+                        <div>
+                            <p className="text-black dark:text-white font-black uppercase text-xs tracking-widest mb-2">No hay movimientos activos</p>
+                            <p className="text-slate-400 font-bold uppercase text-[9px] tracking-widest opacity-70 max-w-[200px] mx-auto leading-relaxed">Configura tus ciclos de pago y facturación automática.</p>
+                        </div>
                     </div>
                 ) : (
                     recurrences.map((tx) => (
                         <Card key={tx.id} className={cn(
-                            "group border-none shadow-sm dark:shadow-none transition-all duration-300 relative overflow-hidden",
-                            tx.isPaused ? "bg-slate-50 dark:bg-meta-4/10 opacity-70" : "bg-white dark:bg-boxdark hover:shadow-md",
+                            "group border-none shadow-sm dark:shadow-none transition-all duration-300 relative overflow-hidden rounded-2xl",
+                            tx.isPaused ? "bg-slate-50 dark:bg-meta-4/5 opacity-70" : "bg-white dark:bg-boxdark hover:shadow-xl hover:-translate-y-0.5",
                             selectedIds.includes(tx.id) && "ring-2 ring-primary ring-inset"
                         )}>
-                            <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: tx.category?.color || (tx.type === 'TRASPASO' ? '#3c50e0' : '#94a3b8') }} />
+                            <div className="absolute top-0 left-0 w-1.5 md:w-2 h-full opacity-70" style={{ backgroundColor: tx.category?.color || (tx.type === 'TRASPASO' ? '#3c50e0' : '#94a3b8') }} />
 
-                            <div className="p-5 flex flex-col md:flex-row items-center justify-between gap-6">
-                                <div className="flex items-center gap-4 flex-1">
+                            <div className="p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8">
+                                <div className="flex items-start md:items-center gap-4 md:gap-6 flex-1">
                                     <div
                                         onClick={() => toggleSelect(tx.id)}
-                                        className="cursor-pointer transition-all active:scale-90"
+                                        className="cursor-pointer transition-all active:scale-90 mt-1.5 md:mt-0"
                                     >
                                         {selectedIds.includes(tx.id) ? (
-                                            <CheckCircle className="w-6 h-6 text-primary" />
+                                            <CheckCircle className="w-6 h-6 text-primary shadow-sm" />
                                         ) : (
-                                            <Circle className="w-6 h-6 text-slate-300 dark:text-slate-700" />
+                                            <Circle className="w-6 h-6 text-slate-200 dark:text-slate-700 hover:text-primary/30 transition-colors" />
                                         )}
                                     </div>
                                     <div className={cn(
-                                        "flex h-12 w-12 shrink-0 items-center justify-center rounded-md text-sm font-bold border",
+                                        "flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-bold border shadow-inner transition-transform group-hover:scale-105",
                                         tx.type === "INGRESO" ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/10" :
                                             tx.type === "GASTO" ? "bg-rose-500/10 text-rose-600 border-rose-500/10" : "bg-blue-500/10 text-blue-600 border-blue-500/10"
                                     )}>
                                         {tx.type === "INGRESO" ? <ArrowDownLeft className="w-6 h-6" /> :
                                             tx.type === "GASTO" ? <ArrowUpRight className="w-6 h-6" /> : <ArrowLeftRight className="w-6 h-6" />}
                                     </div>
-                                    <div className="min-w-0">
-                                        <div className="flex items-center gap-3">
-                                            <h4 className="font-bold text-black dark:text-white uppercase tracking-tight text-base truncate">{tx.description}</h4>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                                            <h4 className="font-black text-black dark:text-white uppercase tracking-tight text-sm md:text-lg truncate group-hover:text-primary transition-colors">{tx.description}</h4>
                                             {tx.isPaused && (
-                                                <span className="bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest">Pausado</span>
+                                                <span className="px-2 py-0.5 bg-amber-500/10 text-amber-500 text-[8px] font-black rounded-lg uppercase tracking-widest border border-amber-500/20">
+                                                    Pausado
+                                                </span>
                                             )}
                                         </div>
-                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[12px] font-bold uppercase tracking-widest">
-                                            <span style={{ color: tx.category?.color || '#94a3b8' }}>{tx.category?.name || "Global"}</span>
-                                            <span className="text-slate-300 dark:text-slate-600">•</span>
-                                            <span style={{ color: tx.account?.color || '#3c50e0' }}>{tx.account?.name}</span>
-                                            <span className="text-slate-300 dark:text-slate-600">•</span>
-                                            <span className="text-primary flex items-center gap-1">
-                                                <Clock className="w-3 h-3" /> {tx.frequency?.name ||
-                                                    (tx.recurrencePeriod ? `${tx.recurrencePeriod} ${tx.recurrenceInterval > 1 ? `(x${tx.recurrenceInterval})` : ''}` : "Mensual")}
-                                            </span>
-                                            <span className="text-slate-300 dark:text-slate-600">•</span>
-                                            <span className="text-amber-600 dark:text-amber-500 flex items-center gap-1">
-                                                <Calendar className="w-3 h-3" /> Próximo: {formattedNextDate(calculateNextDate(tx))}
-                                            </span>
+                                        <div className="flex flex-wrap items-center gap-3">
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-meta-4/20 rounded-lg border border-stroke dark:border-strokedark shadow-sm">
+                                                <div className="w-2 h-2 rounded-full shadow-inner" style={{ backgroundColor: tx.category?.color || '#94a3b8' }} />
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{tx.category?.name || "Global"}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-50 dark:bg-meta-4/20 rounded-lg border border-stroke dark:border-strokedark shadow-sm">
+                                                <div className="w-2 h-2 rounded-full shadow-inner" style={{ backgroundColor: tx.account?.color || '#3c50e0' }} />
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{tx.account?.name}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/5 rounded-lg border border-primary/10 shadow-sm text-primary">
+                                                <Clock className="w-3.5 h-3.5" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">
+                                                    {tx.frequency?.name || (tx.recurrencePeriod ? `${tx.recurrencePeriod} ${tx.recurrenceInterval > 1 ? `(x${tx.recurrenceInterval})` : ''}` : "Mensual")}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col items-end gap-2 pr-4 border-r border-stroke dark:border-strokedark">
-                                    <p className={cn(
-                                        "text-2xl font-black tracking-tight",
-                                        tx.type === "INGRESO" ? "text-emerald-500" :
-                                            tx.type === "GASTO" ? "text-rose-500" : "text-blue-500"
-                                    )}>
-                                        {tx.type === "GASTO" ? "-" : tx.type === "INGRESO" ? "+" : ""}{formatCurrency(Math.abs(tx.amount))}
-                                    </p>
-                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
-                                        {tx.recurrenceInterval} ejecuciones rest.
-                                    </span>
-                                </div>
+                                <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-3 md:gap-2">
+                                    <div className="flex flex-col items-start md:items-end">
+                                        <p className={cn("text-xl md:text-2xl font-black tracking-tight", tx.type === "INGRESO" ? "text-emerald-500" : tx.type === "GASTO" ? "text-rose-500" : "text-blue-500")}>
+                                            {tx.type === "GASTO" ? "-" : tx.type === "INGRESO" ? "+" : ""}{formatCurrency(Math.abs(tx.amount))}
+                                        </p>
+                                        <div className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                            <Calendar className="w-3.5 h-3.5 text-primary opacity-50" />
+                                            <span>Próximo: <span className="text-slate-600 dark:text-slate-300">{formattedNextDate(calculateNextDate(tx))}</span></span>
+                                        </div>
+                                    </div>
 
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleExecute(tx.id)}
-                                        className="h-10 w-10 rounded-md bg-blue-50 dark:bg-blue-500/10 text-blue-500 border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20"
-                                        title="Ejecutar ahora"
-                                    >
-                                        <PlayCircle className="w-5 h-5" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleTogglePause(tx)}
-                                        className={cn(
-                                            "h-10 w-10 rounded-md border transition-all",
-                                            tx.isPaused
-                                                ? "bg-emerald-50 text-emerald-500 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20"
-                                                : "bg-amber-50 text-amber-500 border-amber-200 hover:bg-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20"
-                                        )}
-                                        title={tx.isPaused ? "Reanudar" : "Pausar"}
-                                    >
-                                        {tx.isPaused ? <PlayCircle className="w-5 h-5" /> : <PauseCircle className="w-5 h-5" />}
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => openEdit(tx)}
-                                        className="h-10 w-10 rounded-md bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-primary border border-stroke dark:border-strokedark transition-colors"
-                                    >
-                                        <Settings className="w-5 h-5" />
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleDelete(tx.id)}
-                                        className="h-10 w-10 rounded-md bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-rose-500 border border-stroke dark:border-strokedark transition-colors"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </Button>
+                                    <div className="flex items-center gap-1.5 md:mt-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleExecute(tx.id)}
+                                            className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-emerald-500 hover:bg-emerald-500/10 border border-stroke dark:border-strokedark group/btn"
+                                            title="Ejecutar ahora"
+                                        >
+                                            <PlayCircle className="w-5 h-5 transition-transform group-hover/btn:scale-110" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleTogglePause(tx)}
+                                            className={cn(
+                                                "h-9 w-9 md:h-10 md:w-10 rounded-xl border border-stroke dark:border-strokedark group/btn",
+                                                tx.isPaused ? "bg-emerald-500/10 text-emerald-500" : "bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-primary hover:bg-primary/10"
+                                            )}
+                                            title={tx.isPaused ? "Reanudar" : "Pausar"}
+                                        >
+                                            {tx.isPaused ? <PlayCircle className="w-5 h-5 fill-current" /> : <PauseCircle className="w-5 h-5 transition-transform group-hover/btn:scale-110" />}
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => openEdit(tx)}
+                                            className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-primary hover:bg-primary/10 border border-stroke dark:border-strokedark group/btn"
+                                            title="Ajustar"
+                                        >
+                                            <Settings className="w-4 h-4 transition-transform group-hover/btn:rotate-90" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(tx.id)}
+                                            className="h-9 w-9 md:h-10 md:w-10 rounded-xl bg-slate-50 dark:bg-meta-4 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 border border-stroke dark:border-strokedark group/btn"
+                                            title="Eliminar"
+                                        >
+                                            <Trash2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </Card>
@@ -485,143 +498,151 @@ export default function RecurringPage() {
                 )}
             </div>
 
-            {/* Modal */}
+            {/* Form Modal */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogContent className="sm:max-w-lg bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-8 text-white space-y-1">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">
-                            {editingTx ? "Editar" : "Nueva"}
-                        </DialogTitle>
-                        <DialogDescription className="text-slate-400 text-xs font-semibold uppercase tracking-widest italic opacity-70">
-                            Configuración de flujo automatizado
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <RefreshCcw className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    {editingTx ? "Editar" : "Nueva"} <span className="text-primary italic">Recurrencia</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    AUTOMATIZA TUS FLUJOS DE DINERO.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6 overflow-y-auto">
-                        <div className="grid grid-cols-2 gap-6">
+                    <div className="p-6 md:p-8 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Tipo</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Tipo de Operación</Label>
                                 <Select value={type} onValueChange={setType}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="GASTO" className="text-rose-500 font-bold">GASTO</SelectItem>
-                                        <SelectItem value="INGRESO" className="text-emerald-500 font-bold">INGRESO</SelectItem>
-                                        <SelectItem value="TRASPASO" className="text-primary font-bold">TRASPASO</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="GASTO" className="text-rose-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-rose-500/5 cursor-pointer rounded-lg">GASTO</SelectItem>
+                                        <SelectItem value="INGRESO" className="text-emerald-500 font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-emerald-500/5 cursor-pointer rounded-lg">INGRESO</SelectItem>
+                                        <SelectItem value="TRASPASO" className="text-primary font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">TRASPASO</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Importe</Label>
-                                <Input
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
-                                    placeholder="0.00"
-                                    className="h-11 bg-primary/5 dark:bg-primary/10 border-stroke dark:border-strokedark rounded-md font-black text-lg text-primary text-center"
-                                />
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Importe Fijo</Label>
+                                <div className="relative group">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 bg-primary/10 rounded-md text-primary font-black text-xs">€</div>
+                                    <Input
+                                        type="number"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        placeholder="0.00"
+                                        className="h-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-black text-xl text-primary text-center pl-14 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                                    />
+                                </div>
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Descripción / Alias</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nombre / Identificador</Label>
                             <Input
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Ej: Netflix, Nómina, Alquiler..."
-                                className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
+                                className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white px-5 shadow-sm focus:ring-2 focus:ring-primary/20 transition-all"
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cuenta</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Cuenta {type === "TRASPASO" ? "Origen" : ""}</Label>
                                 <Select value={accountId} onValueChange={setAccountId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue placeholder="Elegir..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{acc.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Frecuencia Personalizada</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Frecuencia Especial</Label>
                                 <Select value={frequencyId} onValueChange={setFrequencyId}>
-                                    <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary">
+                                    <SelectTrigger className="h-12 bg-primary/5 dark:bg-primary/10 border-none rounded-xl font-bold text-primary shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
                                         <SelectValue placeholder="Opcional..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="none" className="font-bold">Ninguna (Usar estándar)</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="none" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">Ninguna (Usar tiempo)</SelectItem>
                                         {frequencies.map(f => (
-                                            <SelectItem key={f.id} value={f.id} className="font-bold">{f.name}</SelectItem>
+                                            <SelectItem key={f.id} value={f.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{f.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                         </div>
 
-                        {!frequencyId || frequencyId === "none" ? (
-                            <div className="grid grid-cols-2 gap-6 animate-in fade-in slide-in-from-top-2">
+                        {(!frequencyId || frequencyId === "none") && (
+                            <div className="grid grid-cols-2 gap-6 p-5 bg-slate-50 dark:bg-meta-4/20 rounded-2xl border border-dashed border-stroke dark:border-strokedark/50 animate-in fade-in slide-in-from-top-2">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Periodo Estándar</Label>
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Ciclo</Label>
                                     <Select value={recurrencePeriod} onValueChange={setRecurrencePeriod}>
-                                        <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
+                                        <SelectTrigger className="h-10 bg-white dark:bg-boxdark border-none rounded-xl font-bold text-black dark:text-white shadow-sm">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                            <SelectItem value="DIARIO" className="font-bold">DIARIO</SelectItem>
-                                            <SelectItem value="SEMANAL" className="font-bold">SEMANAL</SelectItem>
-                                            <SelectItem value="MENSUAL" className="font-bold">MENSUAL</SelectItem>
-                                            <SelectItem value="ANUAL" className="font-bold">ANUAL</SelectItem>
+                                        <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                            <SelectItem value="DIARIO" className="font-bold text-[10px] uppercase tracking-widest py-2 px-4 rounded-lg">DIARIO</SelectItem>
+                                            <SelectItem value="SEMANAL" className="font-bold text-[10px] uppercase tracking-widest py-2 px-4 rounded-lg">SEMANAL</SelectItem>
+                                            <SelectItem value="MENSUAL" className="font-bold text-[10px] uppercase tracking-widest py-2 px-4 rounded-lg">MENSUAL</SelectItem>
+                                            <SelectItem value="ANUAL" className="font-bold text-[10px] uppercase tracking-widest py-2 px-4 rounded-lg">ANUAL</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nº de Ejecuciones</Label>
+                                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Intervalo</Label>
                                     <Input
                                         type="number"
                                         value={recurrenceInterval}
                                         onChange={(e) => setRecurrenceInterval(parseInt(e.target.value) || 1)}
                                         min="1"
-                                        className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold"
+                                        className="h-10 bg-white dark:bg-boxdark border-none rounded-xl font-black text-center text-primary shadow-sm"
                                     />
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 italic">
-                                        Se pausará tras llegar a 0.
-                                    </p>
                                 </div>
                             </div>
-                        ) : null}
+                        )}
 
                         {type === "TRASPASO" ? (
-                            <div className="space-y-2 animate-in fade-in slide-in-from-left-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cuenta Destino</Label>
+                            <div className="space-y-2 p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-dashed border-primary/20 animate-in slide-in-from-left-2">
+                                <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1">Cuenta Destino</Label>
                                 <Select value={destinationAccountId} onValueChange={setDestinationAccountId}>
-                                    <SelectTrigger className="h-11 bg-primary/5 dark:bg-primary/10 border-primary/20 rounded-md font-bold text-primary">
+                                    <SelectTrigger className="h-12 bg-white dark:bg-boxdark border-none rounded-xl font-bold text-primary shadow-sm focus:ring-2 focus:ring-primary/40 transition-all">
                                         <SelectValue placeholder="Seleccionar destino..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {accounts.filter(a => a.id !== accountId).map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{acc.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Categoría</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Categoría / Sector</Label>
                                 <Select value={categoryId} onValueChange={setCategoryId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold">
-                                        <SelectValue placeholder="Opcional..." />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Sin categoría (Global)..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
                                         {categories.map(cat => (
-                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                                                     {cat.name}
                                                 </div>
                                             </SelectItem>
@@ -631,32 +652,41 @@ export default function RecurringPage() {
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Próxima Ejecución</Label>
-                            <Input
-                                type="date"
-                                value={nextDate}
-                                onChange={(e) => setNextDate(e.target.value)}
-                                className="h-11 bg-amber-50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/20 rounded-md font-bold text-amber-600"
-                            />
-                            <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 italic">
-                                El movimiento se generará automáticamente a partir de este día.
-                            </p>
-                        </div>
-
-                        <div className="flex items-center justify-between h-14 px-5 bg-slate-50 dark:bg-meta-4/20 border border-stroke dark:border-strokedark rounded-md">
-                            <div className="flex flex-col">
-                                <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest cursor-pointer" htmlFor="pause">Estado</Label>
-                                <span className="text-[9px] text-slate-400 font-bold uppercase italic">Pausar generación</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-end">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Próxima Ejecución</Label>
+                                <div className="relative group">
+                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Input
+                                        type="date"
+                                        value={nextDate}
+                                        onChange={(e) => setNextDate(e.target.value)}
+                                        className="h-12 pl-12 bg-amber-50 dark:bg-amber-500/5 border-none rounded-xl font-bold text-amber-600 shadow-sm focus:ring-2 focus:ring-amber-500/20 transition-all"
+                                    />
+                                </div>
                             </div>
-                            <Switch id="pause" checked={isPaused} onCheckedChange={setIsPaused} />
+                            <div className="flex items-center justify-between h-12 px-5 bg-slate-50 dark:bg-meta-4/20 rounded-xl border border-stroke dark:border-strokedark/50">
+                                <div className="flex flex-col">
+                                    <Label className="text-[10px] font-black uppercase text-slate-500 tracking-widest cursor-pointer leading-none" htmlFor="pause">Pausar</Label>
+                                </div>
+                                <Switch id="pause" checked={isPaused} onCheckedChange={setIsPaused} />
+                            </div>
                         </div>
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
-                        <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-md font-bold uppercase text-[10px] tracking-widest text-slate-400 h-12">Cancelar</Button>
-                        <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-bold uppercase text-[10px] tracking-widest h-12 shadow-md border-none">
-                            {editingTx ? "Actualizar" : "Activar"}
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3 shrink-0">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsModalOpen(false)}
+                            className="flex-1 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors h-12"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleSave}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
+                        >
+                            {editingTx ? "Guardar Cambios" : "Activar Recurrencia"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -664,30 +694,38 @@ export default function RecurringPage() {
 
             {/* Bulk Edit Modal */}
             <Dialog open={isBulkEditModalOpen} onOpenChange={setIsBulkEditModalOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden">
-                    <DialogHeader className="bg-primary p-8 text-white">
-                        <DialogTitle className="text-xl font-bold uppercase tracking-tight">
-                            Edición Masiva
-                        </DialogTitle>
-                        <DialogDescription className="text-white/70 text-xs font-semibold uppercase tracking-widest italic">
-                            Actualizando {selectedIds.length} recurrencias seleccionadas
-                        </DialogDescription>
+                <DialogContent className="w-[95vw] sm:max-w-xl bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden flex flex-col max-h-[95vh] rounded-2xl">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <Settings className="w-5 h-5 md:w-6 md:h-6" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none mb-1.5">
+                                    Edición <span className="text-primary italic">Masiva</span>
+                                </DialogTitle>
+                                <DialogDescription className="text-[10px] md:text-xs font-bold uppercase text-slate-400 tracking-widest leading-none opacity-70">
+                                    PROCESANDO {selectedIds.length} RECURRENCIAS.
+                                </DialogDescription>
+                            </div>
+                        </div>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6">
+                    <div className="p-6 md:p-8 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nueva Categoría</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nueva Categoría</Label>
                                 <Select value={bulkCategoryId} onValueChange={setBulkCategoryId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold italic">
-                                        <SelectValue placeholder="Sin cambios" />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Mantener originales..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">No modificar</SelectItem>
                                         {categories.map(cat => (
-                                            <SelectItem key={cat.id} value={cat.id} className="font-bold">
+                                            <SelectItem key={cat.id} value={cat.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
+                                                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                                                     {cat.name}
                                                 </div>
                                             </SelectItem>
@@ -697,15 +735,15 @@ export default function RecurringPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nueva Cuenta</Label>
+                                <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nueva Cuenta</Label>
                                 <Select value={bulkAccountId} onValueChange={setBulkAccountId}>
-                                    <SelectTrigger className="h-11 bg-slate-50 dark:bg-meta-4 border-stroke dark:border-strokedark rounded-md font-bold italic">
-                                        <SelectValue placeholder="Sin cambios" />
+                                    <SelectTrigger className="h-12 bg-slate-50 dark:bg-meta-4/20 border-none rounded-xl font-bold text-black dark:text-white shadow-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                                        <SelectValue placeholder="Mantener originales..." />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-white dark:bg-boxdark border-stroke dark:border-strokedark rounded-md">
-                                        <SelectItem value="no_change" className="font-bold">Mantener actuales</SelectItem>
+                                    <SelectContent className="bg-white dark:bg-boxdark border-none rounded-xl shadow-2xl z-[60] p-2">
+                                        <SelectItem value="no_change" className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-slate-50 cursor-pointer rounded-lg text-slate-400 italic">No modificar</SelectItem>
                                         {accounts.map(acc => (
-                                            <SelectItem key={acc.id} value={acc.id} className="font-bold">{acc.name}</SelectItem>
+                                            <SelectItem key={acc.id} value={acc.id} className="font-bold text-[10px] uppercase tracking-widest py-3 px-4 focus:bg-primary/5 cursor-pointer rounded-lg">{acc.name}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -713,10 +751,21 @@ export default function RecurringPage() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
-                        <Button variant="ghost" onClick={() => setIsBulkEditModalOpen(false)} className="flex-1 rounded-md font-bold uppercase text-[10px] tracking-widest text-slate-400 h-12">Cancelar</Button>
-                        <Button onClick={handleBulkUpdate} disabled={isBulkUpdating} className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-md font-bold uppercase text-[10px] tracking-widest h-12 shadow-md border-none">
-                            {isBulkUpdating ? "Actualizando..." : "Aplicar Cambios"}
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark flex flex-row gap-3">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsBulkEditModalOpen(false)}
+                            className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleBulkUpdate}
+                            disabled={isBulkUpdating}
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black uppercase text-[10px] tracking-widest h-12 shadow-lg border-none active:scale-[0.98] transition-all"
+                        >
+                            {isBulkUpdating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                            Aplicar Cambios
                         </Button>
                     </DialogFooter>
                 </DialogContent>

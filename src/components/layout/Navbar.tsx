@@ -346,23 +346,23 @@ export function Navbar() {
 
             {/* Modal de Perfil Propio */}
             <Dialog open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-                <DialogContent className="sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden rounded-3xl">
-                    <DialogHeader className="bg-slate-900 dark:bg-boxdark-2 p-8 text-white text-left relative overflow-hidden">
+                <DialogContent className="w-[95vw] sm:max-w-md bg-white dark:bg-boxdark border-none shadow-2xl p-0 overflow-hidden rounded-2xl flex flex-col max-h-[95vh]">
+                    <DialogHeader className="bg-boxdark dark:bg-boxdark-2 p-6 md:p-8 text-white text-left relative overflow-hidden shrink-0">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full -mr-16 -mt-16" />
-                        <div className="flex items-center justify-between mb-4 relative z-10">
-                            <DialogTitle className="text-2xl font-black italic tracking-tighter uppercase leading-none">
-                                Mi Perfil <span className="text-primary italic">Mone.yo</span>
+                        <div className="flex items-center justify-between mb-2 relative z-10">
+                            <DialogTitle className="text-xl md:text-2xl font-black tracking-tight uppercase leading-none">
+                                Ajustes <span className="text-primary italic">Perfil</span>
                             </DialogTitle>
-                            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20">
-                                <UserCircle2 className="w-7 h-7 text-white" />
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                                <UserCircle2 className="w-6 h-6 md:w-7 md:h-7 text-white" />
                             </div>
                         </div>
-                        <DialogDescription className="text-slate-400 font-medium text-xs leading-relaxed max-w-[280px] relative z-10 uppercase tracking-widest">
-                            GESTIONA TU IDENTIDAD DIGITAL Y REFUERZA LA SEGURIDAD DE TU CUENTA.
+                        <DialogDescription className="text-slate-400 font-bold text-[10px] md:text-xs leading-relaxed max-w-[280px] relative z-10 uppercase tracking-widest opacity-70">
+                            GESTIONA TU IDENTIDAD Y SEGURIDAD DIGITAL
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="p-8 space-y-6 bg-white dark:bg-boxdark">
+                    <div className="p-5 md:p-8 space-y-6 bg-white dark:bg-boxdark overflow-y-auto custom-scrollbar flex-1">
                         <div className="space-y-4">
                             <div className="space-y-2 text-left">
                                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 opacity-70">Nombre Público</Label>
@@ -370,7 +370,7 @@ export function Navbar() {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Tu nombre"
-                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-2xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
+                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
                                 />
                             </div>
                             <div className="space-y-2 text-left">
@@ -379,7 +379,7 @@ export function Navbar() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="correo@ejemplo.com"
-                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-2xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
+                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
                                 />
                             </div>
                             <div className="space-y-2 text-left">
@@ -388,14 +388,14 @@ export function Navbar() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-2xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
+                                    className="h-12 bg-slate-50 dark:bg-meta-4 border-none rounded-xl font-bold focus:ring-2 focus:ring-primary/20 transition-all text-slate-900 dark:text-white"
                                     placeholder="••••••••"
                                 />
                             </div>
                         </div>
 
                         <div className={cn(
-                            "p-5 rounded-3xl border transition-all duration-300",
+                            "p-5 rounded-2xl border transition-all duration-300",
                             twoFactorEnabled
                                 ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20"
                                 : "bg-primary/5 dark:bg-primary/10 border-primary/10 dark:border-primary/20"
@@ -403,19 +403,19 @@ export function Navbar() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm",
+                                        "w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-sm",
                                         twoFactorEnabled ? "bg-white dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-white dark:bg-primary/20 text-primary"
                                     )}>
-                                        {twoFactorEnabled ? <ShieldCheck className="w-6 h-6" /> : <Smartphone className="w-6 h-6" />}
+                                        {twoFactorEnabled ? <ShieldCheck className="w-5 h-5 md:w-6 md:h-6" /> : <Smartphone className="w-5 h-5 md:w-6 md:h-6" />}
                                     </div>
                                     <div className="text-left">
                                         <p className={cn(
-                                            "text-[10px] font-black uppercase tracking-widest leading-none mb-1",
+                                            "text-[9px] md:text-[10px] font-black uppercase tracking-widest leading-none mb-1",
                                             twoFactorEnabled ? "text-emerald-600 dark:text-emerald-400" : "text-primary"
                                         )}>
                                             {twoFactorEnabled ? "Seguridad Máxima" : "Doble Factor (2FA)"}
                                         </p>
-                                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-none italic uppercase">
+                                        <p className="text-[11px] md:text-xs font-bold text-slate-900 dark:text-white leading-none italic uppercase">
                                             {twoFactorEnabled ? "Activado" : "Recomendado"}
                                         </p>
                                     </div>
@@ -432,32 +432,32 @@ export function Navbar() {
                                     }}
                                     className={cn(
                                         "transition-colors",
-                                        twoFactorEnabled ? "data-[state=checked]:bg-emerald-500" : "data-[state=checked]:bg-primary-500"
+                                        twoFactorEnabled ? "data-[state=checked]:bg-emerald-500" : ""
                                     )}
                                 />
                             </div>
 
                             {isConfiguring2FA && (
-                                <div className="mt-6 pt-6 border-t border-primary-200/50 animate-in fade-in slide-in-from-top-4 duration-500 text-left">
+                                <div className="mt-6 pt-6 border-t border-primary/20 animate-in fade-in slide-in-from-top-4 duration-500 text-left">
                                     <div className="space-y-4">
-                                        <div className="bg-white p-4 rounded-2xl border-2 border-primary-100 shadow-inner flex justify-center mx-auto w-fit">
-                                            <img src={qrCodeUrl} alt="QR 2FA" className="w-32 h-32" />
+                                        <div className="bg-white p-3 rounded-xl border-2 border-primary/10 shadow-inner flex justify-center mx-auto w-fit">
+                                            <img src={qrCodeUrl} alt="QR 2FA" className="w-28 h-28 md:w-32 md:h-32" />
                                         </div>
                                         <div className="space-y-4">
-                                            <p className="text-[10px] font-medium text-slate-500 italic text-center px-4 leading-relaxed">
-                                                Escanea con <span className="font-black text-slate-900">Google Authenticator</span> e introduce el código para blindar tu cuenta.
+                                            <p className="text-[10px] font-bold text-slate-500 italic text-center px-4 leading-relaxed uppercase tracking-tight">
+                                                Escanea con <span className="font-black text-slate-900 dark:text-white">Authenticator</span> e introduce el código.
                                             </p>
                                             <div className="flex gap-2">
                                                 <Input
                                                     value={verificationCode}
                                                     onChange={(e) => setVerificationCode(e.target.value)}
-                                                    placeholder="000000"
+                                                    placeholder="000"
                                                     maxLength={6}
-                                                    className="h-12 bg-white border-none rounded-2xl font-black text-center tracking-[0.4em] text-xl text-slate-900 shadow-sm"
+                                                    className="h-12 bg-white dark:bg-meta-4 border-none rounded-xl font-black text-center tracking-[0.3em] text-lg text-slate-900 dark:text-white shadow-sm"
                                                 />
                                                 <Button
                                                     onClick={handleVerify2FA}
-                                                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-12 px-6 font-bold shadow-lg"
+                                                    className="bg-slate-900 dark:bg-primary dark:hover:bg-primary/90 hover:bg-slate-800 text-white rounded-xl h-12 px-6 font-bold shadow-lg uppercase text-[10px] tracking-widest border-none"
                                                 >
                                                     Validar
                                                 </Button>
@@ -470,7 +470,7 @@ export function Navbar() {
 
                         {/* Reporte Mensual Switch */}
                         <div className={cn(
-                            "p-5 rounded-3xl border transition-all duration-300",
+                            "p-5 rounded-2xl border transition-all duration-300",
                             monthlyReportEnabled
                                 ? "bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20"
                                 : "bg-slate-50 dark:bg-slate-800/10 border-slate-100 dark:border-slate-800/20"
@@ -478,19 +478,19 @@ export function Navbar() {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm",
-                                        monthlyReportEnabled ? "bg-white dark:bg-blue-500/20 text-blue-600 dark:text-blue-400" : "bg-white dark:bg-slate-800 text-slate-400"
+                                        "w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-sm",
+                                        monthlyReportEnabled ? "bg-white dark:bg-blue-500/20 text-blue-600 dark:text-blue-400" : "bg-white dark:bg-slate-800/50 text-slate-400"
                                     )}>
-                                        <Sparkles className="w-6 h-6" />
+                                        <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
                                     </div>
                                     <div className="text-left">
                                         <p className={cn(
-                                            "text-[10px] font-black uppercase tracking-widest leading-none mb-1",
+                                            "text-[9px] md:text-[10px] font-black uppercase tracking-widest leading-none mb-1",
                                             monthlyReportEnabled ? "text-blue-600 dark:text-blue-400" : "text-slate-500"
                                         )}>
-                                            IA Smart Reports
+                                            Smart Insights
                                         </p>
-                                        <p className="text-xs font-bold text-slate-900 dark:text-white leading-none italic uppercase">
+                                        <p className="text-[11px] md:text-xs font-bold text-slate-900 dark:text-white leading-none italic uppercase">
                                             {monthlyReportEnabled ? "Reporte Mensual Activo" : "Reporte Desactivado"}
                                         </p>
                                     </div>
@@ -504,24 +504,25 @@ export function Navbar() {
                         </div>
                     </div>
 
-                    <DialogFooter className="p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark shrink-0 flex flex-row gap-3">
+                    <DialogFooter className="p-6 md:p-8 bg-slate-50 dark:bg-meta-4/20 border-t border-stroke dark:border-strokedark shrink-0 flex flex-row gap-3">
                         <Button
                             variant="ghost"
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex-1 rounded-2xl h-14 font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5 transition-all"
+                            className="flex-1 rounded-xl h-12 font-black text-[10px] uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"
                         >
-                            Cancelar
+                            Cerrar
                         </Button>
                         <Button
                             onClick={handleUpdateProfile}
                             disabled={submitting}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-14 font-black text-[10px] uppercase tracking-widest shadow-xl shadow-blue-200 dark:shadow-none active:scale-[0.98] transition-all border-none"
+                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl h-12 font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-[0.98] transition-all border-none"
                         >
-                            {submitting ? "Cargando..." : "Guardar Perfil"}
+                            {submitting ? "..." : "Actualizar"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </header>
     );
 }
