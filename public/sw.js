@@ -1,4 +1,4 @@
-const CACHE_NAME = 'moneyo-cache-v1';
+const CACHE_NAME = 'moneyo-cache-v2';
 const urlsToCache = [
     '/',
     '/manifest.json',
