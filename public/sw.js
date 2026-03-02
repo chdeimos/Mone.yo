@@ -18,7 +18,7 @@ self.addEventListener('fetch', (event) => {
     if (
         event.request.method !== 'GET' ||
         !event.request.url.startsWith('http') ||
-        event.request.url.includes('/api/auth/')
+        event.request.url.includes('/api/')
     ) {
         return;
     }

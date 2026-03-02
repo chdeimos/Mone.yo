@@ -74,8 +74,10 @@ export default function DashboardPage() {
 
         const loadStats = async () => {
             try {
-                // Load stats
-                const res = await fetch("/api/stats");
+                // Load stats with cache busting
+                const res = await fetch(`/api/stats?_t=${Date.now()}`, {
+                    cache: 'no-store'
+                });
                 if (res.ok) {
                     const data = await res.json();
                     setStats(data);
@@ -98,7 +100,9 @@ export default function DashboardPage() {
     const loadHistory = async (period: string) => {
         setHistoryLoading(true);
         try {
-            const res = await fetch(`/api/stats/history?period=${period}`);
+            const res = await fetch(`/api/stats/history?period=${period}&_t=${Date.now()}`, {
+                cache: 'no-store'
+            });
             if (res.ok) {
                 const data = await res.json();
                 setHistoryData(data);
