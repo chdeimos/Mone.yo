@@ -25,9 +25,9 @@ export async function POST(req: Request) {
                         type: type || "GASTO",
                         accountId,
                         categoryId: type === "TRASPASO" ? null : (categoryId || null),
-                        originAccountId: type === "TRASPASO" ? accountId : null,
-                        destinationAccountId: type === "TRASPASO" ? destinationAccountId : null,
-                        isVerified: isVerified ?? true, // Por defecto verificado si viene del banco
+                        originAccountId: type === "TRASPASO" ? (accountId || null) : null,
+                        destinationAccountId: type === "TRASPASO" ? (destinationAccountId || null) : null,
+                        isVerified: isVerified ?? true,
                     }
                 });
 

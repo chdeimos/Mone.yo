@@ -313,9 +313,9 @@ export default function TransactionsPage() {
             description,
             type,
             accountId,
-            destinationAccountId: type === "TRASPASO" ? destinationAccountId : null,
-            originAccountId: accountId,
-            categoryId: type === "TRASPASO" ? null : categoryId,
+            destinationAccountId: type === "TRASPASO" ? (destinationAccountId || null) : null,
+            originAccountId: type === "TRASPASO" ? (accountId || null) : null,
+            categoryId: type === "TRASPASO" ? null : (categoryId || null),
             date: new Date(date).toISOString(),
             imageUrls: [] as string[]
         };
@@ -439,7 +439,7 @@ export default function TransactionsPage() {
         setAmount(Math.abs(tx.amount).toString());
         setDescription(tx.description || "");
         setType(tx.type);
-        setAccountId(tx.accountId);
+        setAccountId(tx.accountId || "");
         setDestinationAccountId(tx.destinationAccountId || "");
         setCategoryId(tx.categoryId || "");
         setDate(new Date(tx.date).toISOString().split('T')[0]);

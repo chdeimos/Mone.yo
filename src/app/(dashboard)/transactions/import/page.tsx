@@ -361,6 +361,13 @@ export default function ImportTransactionsPage() {
             return;
         }
 
+        // Validación de traspasos sin destino
+        const missingDestinations = toSave.filter(d => d.type === "TRASPASO" && !d.destinationAccountId);
+        if (missingDestinations.length > 0) {
+            alert(`Hay ${missingDestinations.length} traspasos sin cuenta de destino seleccionada. Por favor, asígnales una cuenta antes de continuar.`);
+            return;
+        }
+
         setIsSavingImport(true);
         try {
             const res = await fetch("/api/transactions/bulk", {

@@ -59,7 +59,7 @@ export async function PUT(
                     accountId,
                     categoryId,
                     originAccountId: type === "TRASPASO" ? (originAccountId || accountId) : null,
-                    destinationAccountId: type === "TRASPASO" ? destinationAccountId : null,
+                    destinationAccountId: type === "TRASPASO" ? (destinationAccountId || null) : null,
                     isRecurring,
                     isPaused: isRecurring ? (isPaused || false) : false,
                     recurrencePeriod,
