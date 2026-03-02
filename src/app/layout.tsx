@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import type { Viewport } from "next";
 import "./globals.css";
 import "@/lib/init";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -14,16 +15,25 @@ export const metadata: Metadata = {
     title: "Mone.yo - Finanzas Inteligentes",
     description: "Tu asistente personal de finanzas con IA",
     manifest: "/manifest.json",
-    themeColor: "#3b82f6",
-    viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
     appleWebApp: {
         capable: true,
         statusBarStyle: "default",
         title: "Mone.yo",
     },
     icons: {
-        apple: "/icons/icon-192x192.png",
+        apple: [
+            { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+        ],
+        shortcut: "/icons/icon-192x192.png",
     },
+};
+
+export const viewport: Viewport = {
+    themeColor: "#3b82f6",
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
 };
 
 export default function RootLayout({
