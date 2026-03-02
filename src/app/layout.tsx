@@ -14,6 +14,16 @@ export const metadata: Metadata = {
     title: "Mone.yo - Finanzas Inteligentes",
     description: "Tu asistente personal de finanzas con IA",
     manifest: "/manifest.json",
+    themeColor: "#3b82f6",
+    viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "default",
+        title: "Mone.yo",
+    },
+    icons: {
+        apple: "/icons/icon-192x192.png",
+    },
 };
 
 export default function RootLayout({
@@ -42,9 +52,9 @@ export default function RootLayout({
                 >
                     {`
                     if ('serviceWorker' in navigator) {
-                        window.addEventListener('load', function() {
-                            navigator.serviceWorker.register('/sw.js');
-                        });
+                        navigator.serviceWorker.register('/sw.js')
+                        .then(reg => console.log('SW registered'))
+                        .catch(err => console.log('SW support missing'));
                     }
                     `}
                 </Script>
