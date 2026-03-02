@@ -2,7 +2,7 @@
     "name": "Mone.yo - Finanzas Inteligentes",
     "short_name": "Mone.yo",
     "description": "Tu asistente personal de finanzas con IA",
-    "id": "/mone-yo-pwa",
+    "id": "/",
     "start_url": "/",
     "lang": "es",
     "display": "standalone",
